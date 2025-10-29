@@ -7,6 +7,12 @@ const port = 3001;
 app.use(cors());
 app.use(express.json());
 
+// Debug middleware - remove for production
+// app.use((req, res, next) => {
+//     console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+//     next();
+// });
+
 // Mock data
 let customers = [];
 let payments = [];
@@ -278,6 +284,8 @@ app.get('/api/stats', (req, res) => {
 
     res.json(createResponse(true, 'Statistics retrieved', stats));
 });
+
+// Routes are configured above this point
 
 // Seed some initial data
 function seedData() {
