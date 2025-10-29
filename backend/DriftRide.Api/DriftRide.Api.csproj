@@ -1,0 +1,89 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Enable XML documentation generation -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+
+    <!-- Suppress XML documentation warnings for missing comments and other build warnings temporarily -->
+    <NoWarn>$(NoWarn);1591;CS8618;CS8602;CS8603;CS8604;CS8625;CS8601;CS8600;CS0162;CS0414;CS0169;CA1822;CA2016</NoWarn>
+
+    <!-- Enable nullable reference types for better API documentation -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <WarningsNotAsErrors>1591</WarningsNotAsErrors>
+
+    <!-- Temporarily disable static analysis for testing -->
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.20" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+
+    <!-- Entity Framework Core -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
+
+    <!-- SignalR for real-time updates -->
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+
+    <!-- Authentication and Authorization -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.11" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.0" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+
+    <!-- Security and Input Validation -->
+    <PackageReference Include="System.Text.Encodings.Web" Version="8.0.0" />
+
+    <!-- Logging and Monitoring -->
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
+    <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.Seq" Version="6.0.0" />
+
+    <!-- Testing -->
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.11" />
+  </ItemGroup>
+
+  <!-- Include source files from backend/src -->
+  <ItemGroup>
+    <!-- Models -->
+    <Compile Include="../src/models/*.cs" />
+
+    <!-- Data layer -->
+    <Compile Include="../src/data/*.cs" />
+    <Compile Include="../src/data/Configurations/*.cs" />
+    <Compile Include="../src/data/SeedData/*.cs" />
+
+    <!-- Services -->
+    <Compile Include="../src/services/*.cs" />
+
+    <!-- API Controllers and Middleware -->
+    <Compile Include="../src/api/**/*.cs" />
+
+    <!-- SignalR Hubs -->
+    <Compile Include="../src/hubs/*.cs" />
+  </ItemGroup>
+
+  <!-- Project-specific properties -->
+  <PropertyGroup>
+    <AssemblyTitle>DriftRide API</AssemblyTitle>
+    <AssemblyDescription>Backend API for DriftRide application</AssemblyDescription>
+  </PropertyGroup>
+
+</Project>

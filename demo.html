@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriftRide Demo - User Story 1</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .step-indicator { font-size: 1.2rem; font-weight: bold; }
+        .step-active { color: #0066cc; }
+        .step-complete { color: #28a745; }
+        .payment-method { cursor: pointer; border: 2px solid #dee2e6; }
+        .payment-method.selected { border-color: #0066cc; background-color: #f8f9fa; }
+        .notification { position: fixed; top: 20px; right: 20px; z-index: 1000; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">🏎️ DriftRide Queue Management</h1>
+        <h2 class="text-center text-muted mb-4">User Story 1 Demo</h2>
+
+        <!-- Progress Indicator -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between step-indicator">
+                    <span id="step1" class="step-active">1. Customer Info</span>
+                    <span id="step2">2. Payment Method</span>
+                    <span id="step3">3. Payment Process</span>
+                    <span id="step4">4. Queue Status</span>
+                </div>
+                <div class="progress mt-2">
+                    <div id="progress-bar" class="progress-bar" style="width: 25%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Customer Information -->
+        <div id="customer-step" class="card">
+            <div class="card-header">
+                <h3>Step 1: Customer Information</h3>
+            </div>
+            <div class="card-body">
+                <form id="customer-form">
+                    <div class="mb-3">
+                        <label for="customerName" class="form-label">Name *</label>
+                        <input type="text" class="form-control" id="customerName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerPhone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="customerPhone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customerEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="customerEmail">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Continue to Payment</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Step 2: Payment Method Selection -->
+        <div id="payment-step" class="card d-none">
+            <div class="card-header">
+                <h3>Step 2: Select Payment Method</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card payment-method" data-method="cashapp">
+                            <div class="card-body text-center">
+                                <h5>💰 CashApp</h5>
+                                <p>$20.00</p>
+                                <small>Pay via CashApp</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card payment-method" data-method="paypal">
+                            <div class="card-body text-center">
+                                <h5>💳 PayPal</h5>
+                                <p>$20.00</p>
+                                <small>Pay via PayPal</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card payment-method" data-method="cash">
+                            <div class="card-body text-center">
+                                <h5>💵 Cash</h5>
+                                <p>$20.00</p>
+                                <small>Pay with cash</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="continue-payment" class="btn btn-primary d-none">Process Payment</button>
+                <button id="back-customer" class="btn btn-secondary">Back</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Payment Processing -->
+        <div id="processing-step" class="card d-none">
+            <div class="card-header">
+                <h3>Step 3: Payment Processing</h3>
+            </div>
+            <div class="card-body text-center">
+                <div id="payment-processing">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Processing...</span>
+                    </div>
+                    <h4>Processing Your Payment</h4>
+                    <p id="payment-status">Please complete payment in the external app...</p>
+                    <div id="external-app" class="d-none">
+                        <div class="alert alert-info">
+                            <strong>External App Simulation</strong><br>
+                            In real use, this would open CashApp/PayPal
+                        </div>
+                        <button id="simulate-payment" class="btn btn-success">Simulate Payment Complete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Queue Status -->
+        <div id="queue-step" class="card d-none">
+            <div class="card-header">
+                <h3>Step 4: Queue Status</h3>
+            </div>
+            <div class="card-body text-center">
+                <div class="alert alert-success">
+                    <h4>✅ Payment Confirmed!</h4>
+                    <p>You've been added to the drift queue</p>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Queue Position</h5>
+                        <div class="display-4 text-primary" id="queue-position">3</div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Estimated Wait</h5>
+                        <div class="display-4 text-info" id="wait-time">15 min</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button id="reset-demo" class="btn btn-outline-primary">Start New Demo</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Dashboard Button -->
+        <div class="text-center mt-4">
+            <button id="show-sales" class="btn btn-warning">🏢 Switch to Sales Dashboard</button>
+        </div>
+
+        <!-- Sales Dashboard -->
+        <div id="sales-dashboard" class="d-none">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3>Sales Payment Confirmation Dashboard</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Amount</th>
+                                    <th>Method</th>
+                                    <th>Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pending-payments">
+                                <tr id="demo-payment" class="d-none">
+                                    <td id="demo-customer-name">Demo Customer</td>
+                                    <td>$20.00</td>
+                                    <td id="demo-payment-method">CashApp</td>
+                                    <td>Just now</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm me-2" onclick="confirmPayment()">✅ Confirm</button>
+                                        <button class="btn btn-danger btn-sm" onclick="denyPayment()">❌ Deny</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button id="hide-sales" class="btn btn-secondary">🔙 Back to Customer View</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notification-area"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStep = 1;
+        let customerData = {};
+        let selectedPaymentMethod = '';
+
+        // Step navigation
+        function showStep(step) {
+            document.querySelectorAll('.card').forEach(card => card.classList.add('d-none'));
+            document.getElementById(`step${currentStep}`).classList.remove('step-active', 'step-complete');
+
+            currentStep = step;
+            const steps = ['customer-step', 'payment-step', 'processing-step', 'queue-step'];
+            document.getElementById(steps[step - 1]).classList.remove('d-none');
+
+            // Update progress
+            document.getElementById('progress-bar').style.width = `${step * 25}%`;
+
+            // Update step indicators
+            for (let i = 1; i <= 4; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                if (i < step) {
+                    stepEl.className = 'step-complete';
+                } else if (i === step) {
+                    stepEl.className = 'step-active';
+                } else {
+                    stepEl.className = '';
+                }
+            }
+        }
+
+        // Customer form submission
+        document.getElementById('customer-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            customerData = {
+                name: document.getElementById('customerName').value,
+                phone: document.getElementById('customerPhone').value,
+                email: document.getElementById('customerEmail').value
+            };
+            showNotification('Customer information saved!', 'success');
+            showStep(2);
+        });
+
+        // Payment method selection
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', function() {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPaymentMethod = this.dataset.method;
+                document.getElementById('continue-payment').classList.remove('d-none');
+            });
+        });
+
+        // Continue to payment processing
+        document.getElementById('continue-payment').addEventListener('click', function() {
+            showStep(3);
+            setTimeout(() => {
+                document.getElementById('external-app').classList.remove('d-none');
+                document.getElementById('payment-status').textContent = 'Complete payment in the simulation below:';
+            }, 2000);
+        });
+
+        // Simulate payment completion
+        document.getElementById('simulate-payment').addEventListener('click', function() {
+            showNotification('Payment submitted! Waiting for sales confirmation...', 'info');
+            // Show in sales dashboard
+            document.getElementById('demo-customer-name').textContent = customerData.name;
+            document.getElementById('demo-payment-method').textContent = selectedPaymentMethod.toUpperCase();
+            document.getElementById('demo-payment').classList.remove('d-none');
+        });
+
+        // Sales dashboard functions
+        function confirmPayment() {
+            showNotification('Payment confirmed by sales staff!', 'success');
+            document.getElementById('demo-payment').classList.add('d-none');
+            showStep(4);
+        }
+
+        function denyPayment() {
+            showNotification('Payment denied. Customer will be notified.', 'warning');
+            document.getElementById('demo-payment').classList.add('d-none');
+        }
+
+        // Dashboard toggle
+        document.getElementById('show-sales').addEventListener('click', function() {
+            document.getElementById('sales-dashboard').classList.remove('d-none');
+            this.classList.add('d-none');
+        });
+
+        document.getElementById('hide-sales').addEventListener('click', function() {
+            document.getElementById('sales-dashboard').classList.add('d-none');
+            document.getElementById('show-sales').classList.remove('d-none');
+        });
+
+        // Reset demo
+        document.getElementById('reset-demo').addEventListener('click', function() {
+            showStep(1);
+            document.getElementById('customer-form').reset();
+            document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+            document.getElementById('continue-payment').classList.add('d-none');
+            document.getElementById('external-app').classList.add('d-none');
+            document.getElementById('demo-payment').classList.add('d-none');
+            selectedPaymentMethod = '';
+            customerData = {};
+        });
+
+        // Back buttons
+        document.getElementById('back-customer').addEventListener('click', () => showStep(1));
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show notification`;
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.getElementById('notification-area').appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Auto-update queue position (simulation)
+        setInterval(() => {
+            if (currentStep === 4) {
+                const position = Math.max(1, parseInt(document.getElementById('queue-position').textContent) - 1);
+                document.getElementById('queue-position').textContent = position;
+                document.getElementById('wait-time').textContent = `${position * 5} min`;
+
+                if (position === 1) {
+                    showNotification('You\'re next! Head to the drift area!', 'success');
+                }
+            }
+        }, 10000);
+
+        // Initialize
+        showNotification('Welcome to DriftRide! This is a demo of User Story 1.', 'info');
+    </script>
+</body>
+</html>

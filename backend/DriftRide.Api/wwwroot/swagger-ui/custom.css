@@ -1,0 +1,335 @@
+/* DriftRide API Swagger UI Custom Styles */
+
+/* Main theme colors */
+:root {
+  --driftride-primary: #2563eb;
+  --driftride-primary-dark: #1d4ed8;
+  --driftride-secondary: #059669;
+  --driftride-danger: #dc2626;
+  --driftride-warning: #d97706;
+  --driftride-light: #f8fafc;
+  --driftride-dark: #1e293b;
+}
+
+/* Header customization */
+.swagger-ui .topbar {
+  background-color: var(--driftride-dark);
+  border-bottom: 3px solid var(--driftride-primary);
+}
+
+.swagger-ui .topbar .topbar-wrapper {
+  padding: 20px 0;
+}
+
+.swagger-ui .topbar .topbar-wrapper .link {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" fill="white"><text x="10" y="35" font-family="Arial, sans-serif" font-size="24" font-weight="bold">DriftRide API</text></svg>');
+  width: 150px;
+  height: 40px;
+}
+
+/* Info section styling */
+.swagger-ui .info {
+  background: linear-gradient(135deg, var(--driftride-light) 0%, #e2e8f0 100%);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid var(--driftride-primary);
+}
+
+.swagger-ui .info .title {
+  color: var(--driftride-dark);
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+.swagger-ui .info .description {
+  color: #475569;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+/* Authorization section */
+.swagger-ui .auth-wrapper {
+  background: var(--driftride-light);
+  border: 2px solid var(--driftride-primary);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 20px 0;
+}
+
+.swagger-ui .auth-btn-wrapper .btn.authorize {
+  background-color: var(--driftride-secondary);
+  border-color: var(--driftride-secondary);
+  color: white;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.swagger-ui .auth-btn-wrapper .btn.authorize:hover {
+  background-color: #047857;
+  border-color: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+}
+
+.swagger-ui .auth-btn-wrapper .btn.authorize.unlocked {
+  background-color: var(--driftride-danger);
+  border-color: var(--driftride-danger);
+}
+
+/* Operation sections */
+.swagger-ui .opblock {
+  border-radius: 8px;
+  margin: 15px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.swagger-ui .opblock .opblock-summary {
+  padding: 15px 20px;
+  transition: all 0.3s ease;
+}
+
+.swagger-ui .opblock .opblock-summary:hover {
+  background-color: #f1f5f9;
+}
+
+.swagger-ui .opblock.opblock-get {
+  border-left: 4px solid var(--driftride-secondary);
+}
+
+.swagger-ui .opblock.opblock-post {
+  border-left: 4px solid var(--driftride-primary);
+}
+
+.swagger-ui .opblock.opblock-put {
+  border-left: 4px solid var(--driftride-warning);
+}
+
+.swagger-ui .opblock.opblock-delete {
+  border-left: 4px solid var(--driftride-danger);
+}
+
+/* HTTP method labels */
+.swagger-ui .opblock .opblock-summary-method {
+  border-radius: 6px;
+  font-weight: 700;
+  min-width: 80px;
+  text-align: center;
+  padding: 8px 12px;
+}
+
+/* Response sections */
+.swagger-ui .responses-inner h4 {
+  color: var(--driftride-dark);
+  font-weight: 600;
+}
+
+.swagger-ui .response-col_status {
+  font-weight: 700;
+}
+
+.swagger-ui .response .response-col_status[data-status="200"],
+.swagger-ui .response .response-col_status[data-status="201"] {
+  color: var(--driftride-secondary);
+}
+
+.swagger-ui .response .response-col_status[data-status="400"],
+.swagger-ui .response .response-col_status[data-status="401"],
+.swagger-ui .response .response-col_status[data-status="403"],
+.swagger-ui .response .response-col_status[data-status="404"],
+.swagger-ui .response .response-col_status[data-status="409"],
+.swagger-ui .response .response-col_status[data-status="422"],
+.swagger-ui .response .response-col_status[data-status="500"] {
+  color: var(--driftride-danger);
+}
+
+/* Try it out button */
+.swagger-ui .btn.try-out__btn {
+  background-color: var(--driftride-primary);
+  border-color: var(--driftride-primary);
+  color: white;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.swagger-ui .btn.try-out__btn:hover {
+  background-color: var(--driftride-primary-dark);
+  border-color: var(--driftride-primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Execute button */
+.swagger-ui .btn.execute {
+  background-color: var(--driftride-secondary);
+  border-color: var(--driftride-secondary);
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.swagger-ui .btn.execute:hover {
+  background-color: #047857;
+  border-color: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+}
+
+/* Parameter tables */
+.swagger-ui .parameters-col_description {
+  color: #475569;
+}
+
+.swagger-ui .parameter__name {
+  font-weight: 600;
+  color: var(--driftride-dark);
+}
+
+.swagger-ui .parameter__type {
+  color: var(--driftride-primary);
+  font-weight: 500;
+}
+
+/* Schema section */
+.swagger-ui .model-box {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.swagger-ui .model .model-title {
+  color: var(--driftride-dark);
+  font-weight: 600;
+}
+
+/* JSON syntax highlighting */
+.swagger-ui .highlight-code .hljs {
+  background: #1e293b;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+/* Loading animation */
+.swagger-ui .loading-container .loading:after {
+  border-color: var(--driftride-primary) transparent var(--driftride-primary) transparent;
+}
+
+/* Scrollbar customization */
+.swagger-ui ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.swagger-ui ::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.swagger-ui ::-webkit-scrollbar-thumb {
+  background: var(--driftride-primary);
+  border-radius: 4px;
+}
+
+.swagger-ui ::-webkit-scrollbar-thumb:hover {
+  background: var(--driftride-primary-dark);
+}
+
+/* Security badge */
+.swagger-ui .auth-container .security .auth-btn-wrapper::before {
+  content: "🔒 ";
+  font-size: 1.2em;
+}
+
+/* Success/Error message styling */
+.swagger-ui .response .response-col_description {
+  font-weight: 500;
+}
+
+/* JWT token input enhancement */
+.swagger-ui .modal-ux-content .modal-ux-header h3 {
+  color: var(--driftride-dark);
+  font-weight: 600;
+}
+
+.swagger-ui .auth-container input[type="text"] {
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 10px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  transition: border-color 0.3s ease;
+}
+
+.swagger-ui .auth-container input[type="text"]:focus {
+  border-color: var(--driftride-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Footer enhancement */
+.swagger-ui .footer {
+  margin-top: 40px;
+  padding: 20px 0;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+  color: #64748b;
+}
+
+.swagger-ui .footer::after {
+  content: "DriftRide API Documentation - Built with ❤️";
+  display: block;
+  margin-top: 10px;
+  font-style: italic;
+}
+
+/* Responsive enhancements */
+@media (max-width: 768px) {
+  .swagger-ui .info .title {
+    font-size: 2em;
+  }
+
+  .swagger-ui .topbar .topbar-wrapper .link {
+    width: 120px;
+    height: 30px;
+  }
+
+  .swagger-ui .opblock .opblock-summary {
+    padding: 10px 15px;
+  }
+}
+
+/* Animation for new elements */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.swagger-ui .opblock {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Enhanced focus states for accessibility */
+.swagger-ui .btn:focus,
+.swagger-ui input:focus,
+.swagger-ui select:focus,
+.swagger-ui textarea:focus {
+  outline: 3px solid rgba(37, 99, 235, 0.3);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --driftride-primary: #0000ff;
+    --driftride-secondary: #008000;
+    --driftride-danger: #ff0000;
+    --driftride-dark: #000000;
+  }
+}

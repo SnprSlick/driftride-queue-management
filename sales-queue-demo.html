@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriftRide - Sales Queue Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .queue-panel, .pending-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: #4a5568;
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+
+        .panel-content {
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .queue-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: move;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .queue-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .queue-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .queue-item.drag-over {
+            border-color: #48bb78;
+            background: #f0fff4;
+            border-style: dashed;
+        }
+
+        .queue-position {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .queue-position.current {
+            background: #48bb78;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .customer-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-left: 20px;
+        }
+
+        .customer-details h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+            color: #2d3748;
+        }
+
+        .customer-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .customer-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d69e2e;
+        }
+
+        .pending-item {
+            background: #fff5f5;
+            border: 2px solid #fed7d7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .pending-item.urgent {
+            border-color: #e53e3e;
+            background: #fef5e7;
+            animation: urgentPulse 1s infinite alternate;
+        }
+
+        @keyframes urgentPulse {
+            from { background: #fef5e7; }
+            to { background: #fed7d7; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .payment-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .drag-instruction {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .drag-instruction .key {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6b7280;
+            padding: 40px;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .statistics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .customer-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .customer-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏎️ DriftRide Sales Queue Management</h1>
+            <p>Drag & Drop Queue Management • Payment Verification • Customer Support</p>
+        </div>
+
+        <div class="statistics">
+            <div class="stat-card">
+                <div class="stat-value" id="queueCount">0</div>
+                <div class="stat-label">In Queue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pendingCount">0</div>
+                <div class="stat-label">Pending Payments</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completedToday">0</div>
+                <div class="stat-label">Completed Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="revenueToday">$0</div>
+                <div class="stat-label">Today's Revenue</div>
+            </div>
+        </div>
+
+        <div class="drag-instruction">
+            <strong>💡 Queue Management:</strong>
+            Drag customers to reorder the queue • Use <span class="key">R</span> to remove customers •
+            <span class="key">P</span> to prioritize • <span class="key">F5</span> to refresh
+        </div>
+
+        <div class="dashboard">
+            <!-- Queue Management Panel -->
+            <div class="queue-panel">
+                <div class="panel-header">
+                    <h2>🚗 Active Queue</h2>
+                    <span class="badge" id="queueBadge">0 waiting</span>
+                </div>
+                <div class="panel-content">
+                    <div id="queueList" class="queue-list">
+                        <div class="empty-state">
+                            <div class="icon">🏁</div>
+                            <p>No customers in queue</p>
+                            <small>Confirmed payments will appear here</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pending Payments Panel -->
+            <div class="pending-panel">
+                <div class="panel-header">
+                    <h2>💳 Pending Payments</h2>
+                    <span class="badge" id="pendingBadge">0 pending</span>
+                </div>
+                <div class="panel-content">
+                    <div id="pendingList" class="pending-list">
+                        <div class="empty-state">
+                            <div class="icon">✅</div>
+                            <p>No pending payments</p>
+                            <small>New payment submissions will appear here</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+
+        class SalesQueueManager {
+            constructor() {
+                this.queue = [];
+                this.pendingPayments = [];
+                this.stats = {};
+                this.draggedElement = null;
+
+                this.init();
+            }
+
+            async init() {
+                await this.loadData();
+                this.setupEventListeners();
+                this.startPolling();
+                this.showNotification('Sales Queue Management loaded successfully!', 'success');
+            }
+
+            async loadData() {
+                try {
+                    await Promise.all([
+                        this.loadQueue(),
+                        this.loadPendingPayments(),
+                        this.loadStats()
+                    ]);
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    this.showNotification('Failed to load data from server', 'error');
+                }
+            }
+
+            async loadQueue() {
+                const response = await fetch(`${API_BASE}/queue`);
+                const result = await response.json();
+
+                if (result.success) {
+                    this.queue = result.data || [];
+                    this.renderQueue();
+                    this.updateStatistics();
+                }
+            }
+
+            async loadPendingPayments() {
+                const response = await fetch(`${API_BASE}/payments/pending`);
+                const result = await response.json();
+
+                if (result.success) {
+                    this.pendingPayments = result.data || [];
+                    this.renderPendingPayments();
+                    this.updateStatistics();
+                }
+            }
+
+            async loadStats() {
+                const response = await fetch(`${API_BASE}/stats`);
+                const result = await response.json();
+
+                if (result.success) {
+                    this.stats = result.data;
+                    this.updateStatistics();
+                }
+            }
+
+            renderQueue() {
+                const queueList = document.getElementById('queueList');
+                const waitingQueue = this.queue
+                    .filter(item => item.status === 'Waiting')
+                    .sort((a, b) => a.position - b.position);
+
+                if (waitingQueue.length === 0) {
+                    queueList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🏁</div>
+                            <p>No customers in queue</p>
+                            <small>Confirmed payments will appear here</small>
+                        </div>
+                    `;
+                    return;
+                }
+
+                queueList.innerHTML = waitingQueue.map((item, index) => `
+                    <div class="queue-item"
+                         draggable="true"
+                         data-queue-id="${item.id}"
+                         data-position="${item.position}">
+                        <div class="queue-position ${index === 0 ? 'current' : ''}">${item.position}</div>
+                        <div class="customer-info">
+                            <div class="customer-details">
+                                <h3>${item.customer.name}</h3>
+                                <div class="customer-meta">
+                                    <span>📱 ${item.customer.phoneNumber}</span>
+                                    <span>💰 $${item.payment.amount}</span>
+                                    <span>⏰ ${this.formatTime(item.queuedAt)}</span>
+                                    <span>🔄 ${item.payment.paymentMethod}</span>
+                                </div>
+                            </div>
+                            <div class="customer-actions">
+                                <button class="btn btn-warning" onclick="salesQueue.prioritizeCustomer(${item.id})">
+                                    ⬆️ Priority
+                                </button>
+                                <button class="btn btn-danger" onclick="salesQueue.removeCustomer(${item.id})">
+                                    ❌ Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                this.setupDragAndDrop();
+            }
+
+            renderPendingPayments() {
+                const pendingList = document.getElementById('pendingList');
+
+                if (this.pendingPayments.length === 0) {
+                    pendingList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">✅</div>
+                            <p>No pending payments</p>
+                            <small>New payment submissions will appear here</small>
+                        </div>
+                    `;
+                    return;
+                }
+
+                pendingList.innerHTML = this.pendingPayments.map(payment => {
+                    const submittedMinutesAgo = Math.floor((new Date() - new Date(payment.createdAt)) / 60000);
+                    const isUrgent = submittedMinutesAgo > 5;
+
+                    return `
+                        <div class="pending-item ${isUrgent ? 'urgent' : ''}">
+                            <div class="customer-details">
+                                <h3>${payment.customer.name} ${isUrgent ? '🚨' : ''}</h3>
+                                <div class="customer-meta">
+                                    <span>📱 ${payment.customer.phoneNumber}</span>
+                                    <span>💰 $${payment.amount}</span>
+                                    <span>🔄 ${payment.paymentMethod}</span>
+                                    <span>⏰ ${submittedMinutesAgo}min ago</span>
+                                    ${payment.externalTransactionId ? `<span>🔗 ${payment.externalTransactionId}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="payment-actions">
+                                <button class="btn btn-success" onclick="salesQueue.confirmPayment(${payment.id}, true)">
+                                    ✅ Confirm
+                                </button>
+                                <button class="btn btn-danger" onclick="salesQueue.confirmPayment(${payment.id}, false)">
+                                    ❌ Deny
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            setupDragAndDrop() {
+                const queueItems = document.querySelectorAll('.queue-item');
+
+                queueItems.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        this.draggedElement = item;
+                        item.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                    });
+
+                    item.addEventListener('dragend', () => {
+                        item.classList.remove('dragging');
+                        this.draggedElement = null;
+                    });
+
+                    item.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        item.classList.add('drag-over');
+                    });
+
+                    item.addEventListener('dragleave', () => {
+                        item.classList.remove('drag-over');
+                    });
+
+                    item.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        item.classList.remove('drag-over');
+
+                        if (this.draggedElement && this.draggedElement !== item) {
+                            this.reorderQueue(
+                                parseInt(this.draggedElement.dataset.queueId),
+                                parseInt(item.dataset.queueId)
+                            );
+                        }
+                    });
+                });
+            }
+
+            async reorderQueue(draggedId, targetId) {
+                try {
+                    // Find the items
+                    const draggedItem = this.queue.find(q => q.id === draggedId);
+                    const targetItem = this.queue.find(q => q.id === targetId);
+
+                    if (!draggedItem || !targetItem) return;
+
+                    // Create new order
+                    const waitingQueue = this.queue.filter(q => q.status === 'Waiting');
+                    const newOrder = [];
+
+                    for (let item of waitingQueue) {
+                        if (item.id === draggedId) continue;
+                        if (item.id === targetId) {
+                            newOrder.push(draggedId);
+                        }
+                        newOrder.push(item.id);
+                    }
+
+                    // If dragged to the end
+                    if (!newOrder.includes(draggedId)) {
+                        newOrder.push(draggedId);
+                    }
+
+                    const response = await fetch(`${API_BASE}/queue/reorder`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ queueOrder: newOrder })
+                    });
+
+                    if (response.ok) {
+                        await this.loadQueue();
+                        this.showNotification('Queue reordered successfully', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error reordering queue:', error);
+                    this.showNotification('Failed to reorder queue', 'error');
+                }
+            }
+
+            async prioritizeCustomer(queueId) {
+                try {
+                    const waitingQueue = this.queue.filter(q => q.status === 'Waiting');
+                    const newOrder = [queueId, ...waitingQueue.filter(q => q.id !== queueId).map(q => q.id)];
+
+                    const response = await fetch(`${API_BASE}/queue/reorder`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ queueOrder: newOrder })
+                    });
+
+                    if (response.ok) {
+                        await this.loadQueue();
+                        this.showNotification('Customer moved to front of queue', 'success');
+                    }
+                } catch (error) {
+                    console.error('Error prioritizing customer:', error);
+                    this.showNotification('Failed to prioritize customer', 'error');
+                }
+            }
+
+            async removeCustomer(queueId) {
+                const customer = this.queue.find(q => q.id === queueId);
+                if (!customer) return;
+
+                if (confirm(`Remove ${customer.customer.name} from the queue?`)) {
+                    try {
+                        // For now, we'll simulate removal by marking as cancelled
+                        // In a real system, there would be a DELETE endpoint
+                        const newQueue = this.queue.filter(q => q.id !== queueId);
+                        this.queue = newQueue;
+                        this.renderQueue();
+                        this.showNotification(`${customer.customer.name} removed from queue`, 'warning');
+                    } catch (error) {
+                        console.error('Error removing customer:', error);
+                        this.showNotification('Failed to remove customer', 'error');
+                    }
+                }
+            }
+
+            async confirmPayment(paymentId, confirmed) {
+                try {
+                    const response = await fetch(`${API_BASE}/payments/${paymentId}/confirm`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            confirmed,
+                            notes: confirmed ? 'Payment verified by sales staff' : 'Payment could not be verified'
+                        })
+                    });
+
+                    if (response.ok) {
+                        await this.loadData();
+                        const action = confirmed ? 'confirmed' : 'denied';
+                        this.showNotification(`Payment ${action} successfully`, confirmed ? 'success' : 'warning');
+                    }
+                } catch (error) {
+                    console.error('Error confirming payment:', error);
+                    this.showNotification('Failed to confirm payment', 'error');
+                }
+            }
+
+            updateStatistics() {
+                document.getElementById('queueCount').textContent =
+                    this.queue.filter(q => q.status === 'Waiting').length;
+
+                document.getElementById('pendingCount').textContent =
+                    this.pendingPayments.length;
+
+                document.getElementById('queueBadge').textContent =
+                    `${this.queue.filter(q => q.status === 'Waiting').length} waiting`;
+
+                document.getElementById('pendingBadge').textContent =
+                    `${this.pendingPayments.length} pending`;
+
+                if (this.stats) {
+                    document.getElementById('completedToday').textContent = this.stats.completedRides || 0;
+                    document.getElementById('revenueToday').textContent = `$${(this.stats.totalRevenue || 0).toFixed(2)}`;
+                }
+            }
+
+            setupEventListeners() {
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'F5') {
+                        e.preventDefault();
+                        this.loadData();
+                    } else if (e.key === 'r' || e.key === 'R') {
+                        // Remove mode (would need to select a customer first)
+                        this.showNotification('Use the remove button next to each customer', 'info');
+                    } else if (e.key === 'p' || e.key === 'P') {
+                        // Priority mode (would need to select a customer first)
+                        this.showNotification('Use the priority button next to each customer', 'info');
+                    }
+                });
+            }
+
+            startPolling() {
+                // Refresh every 10 seconds
+                setInterval(() => {
+                    this.loadData();
+                }, 10000);
+            }
+
+            formatTime(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMinutes = Math.floor((now - date) / 60000);
+
+                if (diffMinutes < 1) return 'Just now';
+                if (diffMinutes < 60) return `${diffMinutes}m ago`;
+
+                const diffHours = Math.floor(diffMinutes / 60);
+                if (diffHours < 24) return `${diffHours}h ago`;
+
+                return date.toLocaleDateString();
+            }
+
+            showNotification(message, type = 'info') {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 15px 20px;
+                    border-radius: 8px;
+                    color: white;
+                    font-weight: 600;
+                    z-index: 1000;
+                    max-width: 400px;
+                    transform: translateX(500px);
+                    transition: transform 0.3s ease;
+                `;
+
+                // Set colors based on type
+                switch (type) {
+                    case 'success':
+                        notification.style.background = '#48bb78';
+                        break;
+                    case 'error':
+                        notification.style.background = '#e53e3e';
+                        break;
+                    case 'warning':
+                        notification.style.background = '#ed8936';
+                        break;
+                    default:
+                        notification.style.background = '#4299e1';
+                }
+
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                // Animate in
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+
+                // Remove after delay
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(500px)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize the application
+        const salesQueue = new SalesQueueManager();
+    </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+@model DriverCustomerViewModel
+
+<div class="current-customer-display" data-queue-entry-id="@Model.QueueEntryId">
+    <!-- Customer Name with Disambiguation -->
+    <div class="customer-name-section">
+        <h2 class="customer-name-large">@Model.CustomerName</h2>
+        @if (Model.CustomerName != Model.DisplayName)
+        {
+            <div class="disambiguation-time">
+                <i class="fas fa-clock"></i>
+                Arrived at @Model.ArrivalTimeDisplay
+            </div>
+        }
+    </div>
+
+    <!-- Customer Details Grid -->
+    <div class="customer-details-grid">
+        <div class="detail-item">
+            <div class="detail-label">Position</div>
+            <div class="detail-value">#@Model.Position</div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-label">Wait Time</div>
+            <div class="detail-value @(Model.IsWaitingLong ? "text-warning" : "") @(Model.IsWaitingVeryLong ? "text-danger" : "")">
+                @Model.WaitTimeDisplay
+                @if (Model.IsWaitingVeryLong)
+                {
+                    <i class="fas fa-exclamation-triangle text-danger ms-1"></i>
+                }
+            </div>
+        </div>
+
+        <div class="detail-item">
+            <div class="detail-label">Payment</div>
+            <div class="detail-value">
+                @Model.PaymentMethod
+                <small class="d-block text-muted">$@Model.PaymentAmount.ToString("F2")</small>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+        {
+            <div class="detail-item">
+                <div class="detail-label">Contact</div>
+                <div class="detail-value">
+                    <a href="tel:@Model.PhoneNumber" class="text-decoration-none">
+                        <i class="fas fa-phone"></i>
+                        @Model.PhoneNumber
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Wait Time Alert -->
+    @if (Model.IsWaitingVeryLong)
+    {
+        <div class="alert alert-warning text-center">
+            <i class="fas fa-clock"></i>
+            <strong>Extended Wait Time:</strong> This customer has been waiting over 20 minutes.
+            Consider prioritizing or checking for issues.
+        </div>
+    }
+    else if (Model.IsWaitingLong)
+    {
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i>
+            Customer has been waiting over 10 minutes.
+        </div>
+    }
+
+    <!-- Action Button -->
+    <div class="action-section mt-4">
+        <button id="completeCurrentRideBtn"
+                class="btn complete-ride-btn btn-lg w-100"
+                data-queue-entry-id="@Model.QueueEntryId"
+                data-customer-name="@Model.CustomerName">
+            <i class="fas fa-check-circle"></i>
+            Complete Ride for @Model.CustomerName
+        </button>
+
+        <div class="keyboard-hint text-center mt-2">
+            <small class="text-muted">
+                Press <kbd>Space</kbd> or <kbd>Enter</kbd> to complete ride
+            </small>
+        </div>
+    </div>
+</div>
+
+<style>
+.customer-name-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.customer-name-large {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.disambiguation-time {
+    font-size: 1rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.customer-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.detail-item {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+}
+
+.detail-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.3;
+}
+
+.detail-value a {
+    color: inherit;
+    transition: color 0.2s ease;
+}
+
+.detail-value a:hover {
+    color: #007bff;
+}
+
+.complete-ride-btn {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border: none;
+    font-size: 1.5rem;
+    padding: 1.25rem 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.complete-ride-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
+    background: linear-gradient(45deg, #218838, #1e7e34);
+}
+
+.complete-ride-btn:active {
+    transform: translateY(-1px);
+}
+
+.complete-ride-btn:focus {
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+}
+
+.complete-ride-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.complete-ride-btn:hover::before {
+    left: 100%;
+}
+
+.keyboard-hint {
+    margin-top: 1rem;
+}
+
+.keyboard-hint kbd {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    color: #333;
+}
+
+.action-section {
+    padding-top: 2rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .customer-name-large {
+        font-size: 2rem;
+    }
+
+    .customer-details-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .detail-item {
+        padding: 1rem 0.75rem;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+    }
+
+    .complete-ride-btn {
+        font-size: 1.25rem;
+        padding: 1rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .customer-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Animation for loading states */
+.loading-customer {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.completing-ride {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Wait time color coding */
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+</style>

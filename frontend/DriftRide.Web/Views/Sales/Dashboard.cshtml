@@ -1,0 +1,422 @@
+@model SalesDashboardViewModel
+@{
+    ViewData["Title"] = "Sales Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Sales Dashboard Header -->
+<div class="container-fluid">
+    <div class="row bg-dark text-white py-3 mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-tachometer-alt me-2"></i>Sales Dashboard</h2>
+            <p class="mb-0">Welcome, <strong>@Model.DisplayName</strong> |
+               <span class="badge bg-success">@Model.Role</span> |
+               <span id="current-time"></span>
+            </p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group me-2" role="group">
+                <a href="/PaymentConfiguration" class="btn btn-outline-light btn-sm" title="Payment Configuration">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+                <button type="button" class="btn btn-outline-light btn-sm" id="refresh-data" title="Refresh Data (F5)">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button type="button" class="btn btn-outline-light btn-sm" id="toggle-sounds" title="Toggle Sound Alerts (F8)">
+                    <i class="fas fa-volume-up"></i> Sounds
+                </button>
+            </div>
+            <form asp-action="Logout" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger btn-sm" title="Logout (Ctrl+L)">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Pending Payments</h5>
+                            <h2 class="mb-0" id="total-pending">@Model.TotalPendingCount</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-credit-card fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Over 5 Minutes</h5>
+                            <h2 class="mb-0" id="over-5-minutes">@Model.PaymentsOver5Minutes</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Over 10 Minutes</h5>
+                            <h2 class="mb-0" id="over-10-minutes">@Model.PaymentsOver10Minutes</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Queue Length</h5>
+                            <h2 class="mb-0" id="queue-length">@Model.TotalInQueue</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="dashboard-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-payments" type="button" role="tab">
+                <i class="fas fa-list-ul me-2"></i>Pending Payments
+                <span class="badge bg-danger ms-2" id="pending-count">@Model.TotalPendingCount</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="queue-tab" data-bs-toggle="tab" data-bs-target="#queue-management" type="button" role="tab">
+                <i class="fas fa-users-line me-2"></i>Queue Management
+                <span class="badge bg-success ms-2" id="queue-count">@Model.TotalInQueue</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-addition" type="button" role="tab">
+                <i class="fas fa-user-plus me-2"></i>Manual Addition
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="search-tab" data-bs-toggle="tab" data-bs-target="#customer-search" type="button" role="tab">
+                <i class="fas fa-search me-2"></i>Customer Search
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="dashboard-content">
+        <!-- Pending Payments Tab -->
+        <div class="tab-pane fade show active" id="pending-payments" role="tabpanel">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-credit-card me-2"></i>Pending Payment Verification
+                            </h5>
+                            <small class="text-muted">
+                                Target: 30 seconds per payment | Use keyboard shortcuts for speed
+                            </small>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="pending-payments-list">
+                                <!-- Priority Payments (Over 10 minutes) -->
+                                @if (Model.PriorityPayments.Any())
+                                {
+                                    <div class="alert alert-danger m-3 mb-2">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>URGENT:</strong> @Model.PriorityPayments.Count payment(s) waiting over 10 minutes
+                                    </div>
+                                    @foreach (var payment in Model.PriorityPayments)
+                                    {
+                                        <div class="payment-item urgent-payment border-danger" data-payment-id="@payment.Id">
+                                            @await Html.PartialAsync("_PaymentItem", payment)
+                                        </div>
+                                    }
+                                }
+
+                                <!-- Moderate Priority Payments (5-10 minutes) -->
+                                @foreach (var payment in Model.ModeratePayments)
+                                {
+                                    <div class="payment-item moderate-payment border-warning" data-payment-id="@payment.Id">
+                                        @await Html.PartialAsync("_PaymentItem", payment)
+                                    </div>
+                                }
+
+                                <!-- Recent Payments (Under 5 minutes) -->
+                                @foreach (var payment in Model.RecentPayments)
+                                {
+                                    <div class="payment-item recent-payment" data-payment-id="@payment.Id">
+                                        @await Html.PartialAsync("_PaymentItem", payment)
+                                    </div>
+                                }
+
+                                @if (!Model.PendingPayments.Any())
+                                {
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                                        <h4>All payments processed!</h4>
+                                        <p class="text-muted">No pending payments requiring verification.</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Quick Actions Panel -->
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success btn-sm" id="bulk-approve" title="Approve Selected (Ctrl+A)">
+                                    <i class="fas fa-check-double me-2"></i>Bulk Approve Selected
+                                </button>
+                                <button class="btn btn-primary btn-sm" id="next-payment" title="Focus Next Payment (Space)">
+                                    <i class="fas fa-arrow-down me-2"></i>Next Payment
+                                </button>
+                                <button class="btn btn-warning btn-sm" id="filter-urgent" title="Show Only Urgent (U)">
+                                    <i class="fas fa-filter me-2"></i>Filter Urgent
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Keyboard Shortcuts -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-keyboard me-2"></i>Keyboard Shortcuts</h6>
+                        </div>
+                        <div class="card-body">
+                            <small>
+                                <div class="row">
+                                    <div class="col-6"><kbd>A</kbd> Approve</div>
+                                    <div class="col-6"><kbd>D</kbd> Deny</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6"><kbd>Space</kbd> Next</div>
+                                    <div class="col-6"><kbd>Esc</kbd> Clear</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6"><kbd>F5</kbd> Refresh</div>
+                                    <div class="col-6"><kbd>U</kbd> Urgent</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6"><kbd>T</kbd> Tab Switch</div>
+                                    <div class="col-6"><kbd>?</kbd> Help</div>
+                                </div>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Queue Management Tab -->
+        <div class="tab-pane fade" id="queue-management" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-users-line me-2"></i>Current Queue Status</h5>
+                </div>
+                <div class="card-body">
+                    <div id="queue-list">
+                        @if (Model.QueueEntries.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Position</th>
+                                            <th>Customer</th>
+                                            <th>Queued At</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var entry in Model.QueueEntries.OrderBy(q => q.Position))
+                                        {
+                                            <tr data-queue-id="@entry.Id" class="@(entry.Status == "InProgress" ? "table-warning" : "")">
+                                                <td>
+                                                    <span class="badge @(entry.Position == 1 ? "bg-primary" : "bg-secondary")">
+                                                        #@entry.Position
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <strong>@entry.CustomerName</strong>
+                                                </td>
+                                                <td>@entry.QueuedAt.ToString("h:mm tt")</td>
+                                                <td>
+                                                    <span class="badge @(entry.Status switch {
+                                                        "Waiting" => "bg-info",
+                                                        "InProgress" => "bg-warning",
+                                                        "Completed" => "bg-success",
+                                                        _ => "bg-secondary"
+                                                    })">
+                                                        @entry.Status
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @if (entry.Status == "Waiting")
+                                                    {
+                                                        <button class="btn btn-sm btn-outline-danger" onclick="removeFromQueue(@entry.Id)">
+                                                            <i class="fas fa-user-times"></i> Remove
+                                                        </button>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4">
+                                <i class="fas fa-users text-muted fa-3x mb-3"></i>
+                                <h5>Queue is empty</h5>
+                                <p class="text-muted">No customers currently in queue.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Customer Addition Tab -->
+        <div class="tab-pane fade" id="manual-addition" role="tabpanel">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add Customer Manually</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="manual-customer-form">
+                                <div class="mb-3">
+                                    <label for="manual-name" class="form-label">Customer Name</label>
+                                    <input type="text" class="form-control" id="manual-name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="manual-phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="manual-phone" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="manual-reason" class="form-label">Reason for Manual Addition</label>
+                                    <select class="form-select" id="manual-reason-select">
+                                        <option value="">Select a reason...</option>
+                                        @foreach (var reason in ManualCustomerAdditionViewModel.CommonReasons)
+                                        {
+                                            <option value="@reason">@reason</option>
+                                        }
+                                        <option value="custom">Other (specify below)</option>
+                                    </select>
+                                    <textarea class="form-control mt-2" id="manual-reason" rows="3"
+                                              placeholder="Enter reason for manual addition" required></textarea>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-user-plus me-2"></i>Add Customer to Queue
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle me-2"></i>When to Use Manual Addition</h6>
+                        <ul class="mb-0">
+                            <li>Payment method temporarily unavailable</li>
+                            <li>Customer prefers cash payment</li>
+                            <li>Technical issues with payment apps</li>
+                            <li>Customer without smartphone</li>
+                            <li>Group bookings or special arrangements</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Search Tab -->
+        <div class="tab-pane fade" id="customer-search" role="tabpanel">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-search me-2"></i>Customer Lookup</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="search-input"
+                                       placeholder="Search by customer name..." />
+                                <button class="btn btn-outline-secondary" type="button" id="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="search-results">
+                        <!-- Search results will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Real-time Connection Status -->
+<div class="position-fixed bottom-0 end-0 p-3">
+    <div id="connection-status" class="alert alert-info alert-dismissible" style="display: none;">
+        <i class="fas fa-wifi me-2"></i>
+        <span id="connection-text">Connecting...</span>
+    </div>
+</div>
+
+<!-- Audio for notifications -->
+<audio id="notification-sound" preload="auto">
+    <source src="~/audio/notification.mp3" type="audio/mpeg">
+    <source src="~/audio/notification.wav" type="audio/wav">
+</audio>
+
+@section Scripts {
+    <script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+    <script>
+        // Dashboard configuration
+        const dashboardConfig = {
+            apiBaseUrl: '@Model.ApiBaseUrl',
+            signalRHubUrl: '@Model.SignalRHubUrl',
+            refreshInterval: @Model.RefreshIntervalSeconds * 1000,
+            soundAlertsEnabled: @Model.SoundAlertsEnabled.ToString().ToLower(),
+            keyboardShortcutsEnabled: @Model.KeyboardShortcutsEnabled.ToString().ToLower()
+        };
+
+        // Dashboard controller will be implemented in separate JS file
+        console.log('Sales Dashboard initialized with config:', dashboardConfig);
+    </script>
+    <script src="~/js/sales-dashboard.js" asp-append-version="true"></script>
+}

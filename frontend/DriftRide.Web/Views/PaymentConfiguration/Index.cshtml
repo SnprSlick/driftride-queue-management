@@ -1,0 +1,174 @@
+@model DriftRide.Web.Models.PaymentConfigurationManagementViewModel
+@{
+    ViewData["Title"] = "Payment Configuration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-cog"></i> Payment Configuration</h2>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-primary" id="refresh-cache-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh Cache
+                    </button>
+                    <button type="button" class="btn btn-success" id="save-all-btn" disabled>
+                        <i class="fas fa-save"></i> Save All Changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div id="alert-container">
+                @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i> @Model.SuccessMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (Model.ErrorMessages.Any())
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <ul class="mb-0">
+                            @foreach (var error in Model.ErrorMessages)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+            </div>
+
+            <!-- Configuration Cards -->
+            <div class="row" id="payment-config-container">
+                @foreach (var config in Model.PaymentConfigurations)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card payment-config-card" data-config-id="@config.Id">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-@(GetPaymentMethodIcon(config.PaymentMethod))"></i>
+                                    @config.PaymentMethod
+                                </h5>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input config-enabled" type="checkbox"
+                                           @(config.IsEnabled ? "checked" : "")
+                                           data-field="IsEnabled">
+                                    <label class="form-check-label">
+                                        <small>@(config.IsEnabled ? "Enabled" : "Disabled")</small>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <form class="config-form">
+                                    <input type="hidden" class="config-id" value="@config.Id" />
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Display Name</label>
+                                        <input type="text" class="form-control config-field"
+                                               data-field="DisplayName"
+                                               value="@config.DisplayName"
+                                               maxlength="100" required>
+                                    </div>
+
+                                    @if (config.PaymentMethod != "CashInHand")
+                                    {
+                                        <div class="mb-3">
+                                            <label class="form-label">Payment URL</label>
+                                            <input type="url" class="form-control config-field"
+                                                   data-field="PaymentUrl"
+                                                   value="@config.PaymentUrl"
+                                                   maxlength="500"
+                                                   placeholder="https://...">
+                                        </div>
+                                    }
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Price per Ride</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" class="form-control config-field"
+                                                   data-field="PricePerRide"
+                                                   value="@config.PricePerRide"
+                                                   min="0.01" max="999999.99"
+                                                   step="0.01" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input config-field" type="checkbox"
+                                                   data-field="ApiIntegrationEnabled"
+                                                   @(config.ApiIntegrationEnabled ? "checked" : "")>
+                                            <label class="form-check-label">
+                                                Enable API Integration
+                                            </label>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            Automatically verify payments via API
+                                        </small>
+                                    </div>
+
+                                    <div class="mb-3 api-credentials-group" style="@(config.ApiIntegrationEnabled ? "" : "display: none;")">
+                                        <label class="form-label">API Credentials</label>
+                                        <textarea class="form-control config-field"
+                                                  data-field="ApiCredentials"
+                                                  rows="3" maxlength="1000"
+                                                  placeholder="Enter API key or credentials...">@config.ApiCredentials</textarea>
+                                        <small class="form-text text-warning">
+                                            <i class="fas fa-lock"></i> Credentials are encrypted and stored securely
+                                        </small>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <small>
+                                    Last updated: @config.UpdatedAt.ToString("MMM dd, yyyy HH:mm")
+                                    by @config.UpdatedBy
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @if (!Model.PaymentConfigurations.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-exclamation-circle fa-3x text-muted mb-3"></i>
+                    <h4>No Payment Configuration Found</h4>
+                    <p class="text-muted">Please contact system administrator to set up payment methods.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loading-spinner" class="d-none">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/payment-configuration.js"></script>
+}
+
+@functions {
+    private string GetPaymentMethodIcon(string paymentMethod)
+    {
+        return paymentMethod switch
+        {
+            "CashApp" => "mobile-alt",
+            "PayPal" => "paypal",
+            "CashInHand" => "hand-holding-usd",
+            _ => "credit-card"
+        };
+    }
+}

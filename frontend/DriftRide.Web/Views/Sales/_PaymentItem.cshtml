@@ -1,0 +1,134 @@
+@model PendingPaymentResponse
+
+<div class="d-flex justify-content-between align-items-center p-3 border-bottom payment-item-content">
+    <div class="flex-grow-1">
+        <div class="row">
+            <div class="col-md-8">
+                <h6 class="mb-1 fw-bold">
+                    @Model.CustomerName
+                    <span class="badge bg-primary ms-2">#@Model.Id</span>
+                </h6>
+                <p class="mb-1 text-muted">
+                    <i class="fas fa-phone me-1"></i>@Model.CustomerPhone |
+                    <i class="fas fa-dollar-sign me-1"></i>$@Model.Amount.ToString("F2") |
+                    <i class="fas fa-credit-card me-1"></i>@Model.PaymentMethod
+                </p>
+                @if (!string.IsNullOrEmpty(Model.ExternalTransactionId))
+                {
+                    <p class="mb-1">
+                        <small class="text-info">
+                            <i class="fas fa-receipt me-1"></i>Transaction: @Model.ExternalTransactionId
+                        </small>
+                    </p>
+                }
+                <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>
+                    Submitted @Model.CreatedAt.ToString("h:mm tt")
+                    (@Model.MinutesWaiting minutes ago)
+                </small>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-success btn-sm confirm-payment"
+                            data-payment-id="@Model.Id"
+                            data-customer-name="@Model.CustomerName"
+                            title="Approve Payment (A)">
+                        <i class="fas fa-check me-1"></i>Approve
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm deny-payment"
+                            data-payment-id="@Model.Id"
+                            data-customer-name="@Model.CustomerName"
+                            title="Deny Payment (D)">
+                        <i class="fas fa-times me-1"></i>Deny
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            data-bs-toggle="dropdown" title="More Options">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <button class="dropdown-item view-details" data-payment-id="@Model.Id">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </button>
+                        </li>
+                        <li>
+                            <button class="dropdown-item add-notes" data-payment-id="@Model.Id">
+                                <i class="fas fa-sticky-note me-2"></i>Add Notes
+                            </button>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <button class="dropdown-item text-warning flag-review" data-payment-id="@Model.Id">
+                                <i class="fas fa-flag me-2"></i>Flag for Review
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Priority indicator for urgent payments -->
+@if (Model.MinutesWaiting > 10)
+{
+    <div class="position-absolute top-0 start-0 mt-2 ms-2">
+        <span class="badge bg-danger pulse">
+            <i class="fas fa-exclamation-triangle me-1"></i>URGENT
+        </span>
+    </div>
+}
+else if (Model.MinutesWaiting > 5)
+{
+    <div class="position-absolute top-0 start-0 mt-2 ms-2">
+        <span class="badge bg-warning text-dark">
+            <i class="fas fa-clock me-1"></i>Priority
+        </span>
+    </div>
+}
+
+<style>
+    .payment-item {
+        position: relative;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .payment-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(2px);
+    }
+
+    .payment-item.selected {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196F3;
+    }
+
+    .payment-item.urgent-payment {
+        border-left: 4px solid #dc3545;
+        background-color: #fff5f5;
+    }
+
+    .payment-item.moderate-payment {
+        border-left: 4px solid #ffc107;
+        background-color: #fffdf5;
+    }
+
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    .btn-group .btn {
+        white-space: nowrap;
+    }
+
+    .payment-item-content {
+        min-height: 100px;
+    }
+</style>

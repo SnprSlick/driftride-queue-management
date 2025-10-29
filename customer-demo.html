@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriftRide - Customer Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .step-card.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            line-height: 40px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input[type="text"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .payment-method {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .payment-method:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .payment-method.selected {
+            border-color: #667eea;
+            background: #f0f7ff;
+        }
+
+        .payment-method .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .payment-method .name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .payment-method .price {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-animation {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #10b981;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .queue-info {
+            background: #f0f7ff;
+            border: 2px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .position {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            max-width: 400px;
+            transform: translateX(500px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #10b981;
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .notification.info {
+            background: #3b82f6;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .step-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏎️ DriftRide</h1>
+            <p>Experience the thrill of drift racing</p>
+        </div>
+
+        <!-- Step 1: Customer Information -->
+        <div id="step1" class="step-card active">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h2 class="step-title">Welcome to DriftRide</h2>
+                <p class="step-description">Let's get you registered for an awesome drift experience</p>
+            </div>
+
+            <form id="customerForm">
+                <div class="form-group">
+                    <label for="customerName">Full Name *</label>
+                    <input type="text" id="customerName" name="name" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label for="customerPhone">Phone Number *</label>
+                    <input type="tel" id="customerPhone" name="phone" required placeholder="(555) 123-4567">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Continue to Payment</button>
+            </form>
+        </div>
+
+        <!-- Step 2: Payment Method Selection -->
+        <div id="step2" class="step-card">
+            <div class="step-header">
+                <div class="step-number">2</div>
+                <h2 class="step-title">Choose Payment Method</h2>
+                <p class="step-description">Select how you'd like to pay for your drift experience</p>
+            </div>
+
+            <div class="payment-methods" id="paymentMethods">
+                <!-- Payment methods will be loaded dynamically -->
+            </div>
+
+            <button id="selectPaymentBtn" class="btn btn-primary" disabled>Select Payment Method</button>
+            <button class="btn btn-secondary" onclick="goToStep(1)">Back</button>
+        </div>
+
+        <!-- Step 3: Payment Processing -->
+        <div id="step3" class="step-card">
+            <div class="step-header">
+                <div class="step-number">3</div>
+                <h2 class="step-title">Complete Payment</h2>
+                <p class="step-description">Follow the payment instructions</p>
+            </div>
+
+            <div id="paymentInstructions">
+                <!-- Payment instructions will be shown here -->
+            </div>
+
+            <div class="loading" id="paymentLoading">
+                <div class="spinner"></div>
+                <p>Processing your payment...</p>
+            </div>
+
+            <button id="paymentCompleteBtn" class="btn btn-primary" style="display: none;">Payment Complete</button>
+            <button class="btn btn-secondary" onclick="goToStep(2)">Back</button>
+        </div>
+
+        <!-- Step 4: Queue Status -->
+        <div id="step4" class="step-card">
+            <div class="step-header">
+                <div class="step-number">4</div>
+                <h2 class="step-title">You're in the Queue!</h2>
+                <p class="step-description">Get ready for your drift experience</p>
+            </div>
+
+            <div class="success-animation">
+                <div class="success-icon">🎉</div>
+                <h3>Payment Confirmed!</h3>
+                <p>You've successfully joined the drift queue</p>
+            </div>
+
+            <div class="queue-info" id="queueInfo">
+                <div class="position" id="queuePosition">-</div>
+                <h4>Your Position in Queue</h4>
+                <p id="estimatedWait">Calculating wait time...</p>
+                <p><small>We'll keep you updated on your position</small></p>
+            </div>
+
+            <button class="btn btn-primary" onclick="refreshQueue()">Refresh Position</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        let currentCustomer = null;
+        let selectedPaymentMethod = null;
+        let currentPayment = null;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPaymentMethods();
+            setupEventListeners();
+            showNotification('Welcome to DriftRide! Ready to drift?', 'info');
+        });
+
+        function setupEventListeners() {
+            // Customer form submission
+            document.getElementById('customerForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await handleCustomerRegistration();
+            });
+
+            // Payment method selection
+            document.getElementById('selectPaymentBtn').addEventListener('click', function() {
+                if (selectedPaymentMethod) {
+                    goToStep(3);
+                    showPaymentInstructions();
+                }
+            });
+
+            // Payment completion
+            document.getElementById('paymentCompleteBtn').addEventListener('click', async function() {
+                await handlePaymentCompletion();
+            });
+        }
+
+        async function loadPaymentMethods() {
+            try {
+                const response = await fetch(`${API_BASE}/configuration/payment-methods/enabled`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const paymentMethods = result.data;
+                    renderPaymentMethods(paymentMethods);
+                }
+            } catch (error) {
+                console.error('Error loading payment methods:', error);
+                showNotification('Failed to load payment methods', 'error');
+            }
+        }
+
+        function renderPaymentMethods(methods) {
+            const container = document.getElementById('paymentMethods');
+            container.innerHTML = methods.map(method => `
+                <div class="payment-method" data-method="${method.paymentMethod || method.displayName}" data-price="${method.pricePerRide}">
+                    <div class="icon">${getPaymentIcon(method.paymentMethod || method.displayName)}</div>
+                    <div class="name">${method.displayName}</div>
+                    <div class="price">$${method.pricePerRide.toFixed(2)}</div>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            container.querySelectorAll('.payment-method').forEach(element => {
+                element.addEventListener('click', function() {
+                    // Remove previous selection
+                    container.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+
+                    // Select this method
+                    this.classList.add('selected');
+                    selectedPaymentMethod = {
+                        method: this.dataset.method,
+                        price: parseFloat(this.dataset.price)
+                    };
+
+                    document.getElementById('selectPaymentBtn').disabled = false;
+                });
+            });
+        }
+
+        function getPaymentIcon(method) {
+            const icons = {
+                'CashApp': '💸',
+                'PayPal': '💳',
+                'Cash': '💵',
+                'CashInHand': '💵'
+            };
+            return icons[method] || '💳';
+        }
+
+        async function handleCustomerRegistration() {
+            const name = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('customerPhone').value.trim();
+
+            if (!name || !phone) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                currentCustomer = await createCustomer(name, phone);
+                showLoading(false);
+                goToStep(2);
+                showNotification('Registration successful!', 'success');
+            } catch (error) {
+                showLoading(false);
+                console.error('Registration error:', error);
+                showNotification('Registration failed: ' + error.message, 'error');
+            }
+        }
+
+        function showPaymentInstructions() {
+            const instructions = document.getElementById('paymentInstructions');
+            const method = selectedPaymentMethod.method;
+            const price = selectedPaymentMethod.price;
+
+            let content = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h4>Payment Amount: $${price.toFixed(2)}</h4>
+                    <p>Payment Method: ${method}</p>
+                </div>
+            `;
+
+            if (method === 'CashApp' || method === 'PayPal') {
+                content += `
+                    <div style="background: #f0f7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h5>Payment Instructions:</h5>
+                        <ol>
+                            <li>Click the "Open ${method}" button below</li>
+                            <li>Complete the payment in the ${method} app</li>
+                            <li>Return here and click "Payment Complete"</li>
+                        </ol>
+                    </div>
+                    <a href="#" class="btn btn-primary" style="margin-bottom: 15px;">Open ${method} App</a>
+                `;
+            } else if (method === 'CashInHand' || method === 'Cash') {
+                content += `
+                    <div style="background: #f0f7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h5>Cash Payment Instructions:</h5>
+                        <p>Please have $${price.toFixed(2)} ready to pay our staff member before your ride.</p>
+                        <p>Click "Payment Complete" to join the queue.</p>
+                    </div>
+                `;
+            }
+
+            instructions.innerHTML = content;
+            document.getElementById('paymentCompleteBtn').style.display = 'block';
+        }
+
+        async function handlePaymentCompletion() {
+            if (!currentCustomer || !selectedPaymentMethod) {
+                showNotification('Missing customer or payment information', 'error');
+                return;
+            }
+
+            try {
+                document.getElementById('paymentLoading').classList.add('active');
+
+                // Create payment record
+                currentPayment = await createPayment(
+                    currentCustomer.id,
+                    selectedPaymentMethod.price,
+                    selectedPaymentMethod.method
+                );
+
+                document.getElementById('paymentLoading').classList.remove('active');
+                goToStep(4);
+                showNotification('Payment submitted! Awaiting confirmation.', 'success');
+
+                // Start checking queue position
+                checkQueuePosition();
+
+            } catch (error) {
+                document.getElementById('paymentLoading').classList.remove('active');
+                console.error('Payment error:', error);
+                showNotification('Payment failed: ' + error.message, 'error');
+            }
+        }
+
+        async function checkQueuePosition() {
+            if (!currentCustomer) return;
+
+            try {
+                const position = await getQueuePosition(currentCustomer.id);
+                updateQueueDisplay(position);
+            } catch (error) {
+                console.error('Error checking queue position:', error);
+                document.getElementById('queuePosition').textContent = '?';
+                document.getElementById('estimatedWait').textContent = 'Unable to get position';
+            }
+        }
+
+        function updateQueueDisplay(position) {
+            document.getElementById('queuePosition').textContent = position.position;
+            document.getElementById('estimatedWait').textContent = `Estimated wait: ${position.estimatedWait}`;
+
+            if (position.position === 1 || position.position === '1') {
+                showNotification("You're next! Head to the drift area!", 'success');
+            }
+        }
+
+        async function refreshQueue() {
+            await checkQueuePosition();
+            showNotification('Queue position refreshed', 'info');
+        }
+
+        function goToStep(stepNumber) {
+            // Hide all steps
+            document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active'));
+
+            // Show target step
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+        }
+
+        function showLoading(show) {
+            // You can add loading states here if needed
+        }
+
+        // API Functions
+        async function createCustomer(name, phone) {
+            const response = await fetch(`${API_BASE}/customers`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, phoneNumber: phone })
+            });
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error?.message || 'Failed to create customer');
+            }
+            return result.data;
+        }
+
+        async function createPayment(customerId, amount, method) {
+            const response = await fetch(`${API_BASE}/payments`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customerId,
+                    amount,
+                    paymentMethod: method,
+                    externalTransactionId: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                })
+            });
+
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error?.message || 'Failed to create payment');
+            }
+            return result.data;
+        }
+
+        async function getQueuePosition(customerId) {
+            // Get current queue to find position
+            const response = await fetch(`${API_BASE}/queue`);
+            const result = await response.json();
+
+            if (result.success) {
+                const queue = result.data || [];
+                const customerEntry = queue.find(entry => entry.customerId === customerId);
+
+                if (customerEntry) {
+                    return {
+                        position: customerEntry.position,
+                        estimatedWait: `${customerEntry.position * 5} minutes`
+                    };
+                } else {
+                    // Check if payment is still pending
+                    const paymentsResponse = await fetch(`${API_BASE}/payments/pending`);
+                    const paymentsResult = await paymentsResponse.json();
+
+                    if (paymentsResult.success) {
+                        const pendingPayment = paymentsResult.data.find(p => p.customerId === customerId);
+                        if (pendingPayment) {
+                            return {
+                                position: 'Pending',
+                                estimatedWait: 'Awaiting confirmation'
+                            };
+                        }
+                    }
+
+                    return {
+                        position: 'Unknown',
+                        estimatedWait: 'Please contact staff'
+                    };
+                }
+            }
+            throw new Error('Failed to get queue position');
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Show notification
+            setTimeout(() => notification.classList.add('show'), 100);
+
+            // Hide and remove notification
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Auto-refresh queue position every 15 seconds
+        setInterval(() => {
+            if (currentCustomer && document.getElementById('step4').classList.contains('active')) {
+                checkQueuePosition();
+            }
+        }, 15000);
+    </script>
+</body>
+</html>

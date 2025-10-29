@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{A88963B6-8805-4AAA-89AD-9882FB002E2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriftRide.Api", "backend\DriftRide.Api\DriftRide.Api.csproj", "{6F8FCE0E-F18A-45E1-8711-E65600171542}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{53876B3D-4E5B-454E-9486-2888648A23C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DriftRide.Web", "frontend\DriftRide.Web\DriftRide.Web.csproj", "{0153A0E1-A883-4EA0-A7F5-D90F4AF09E30}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F8FCE0E-F18A-45E1-8711-E65600171542}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F8FCE0E-F18A-45E1-8711-E65600171542}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F8FCE0E-F18A-45E1-8711-E65600171542}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F8FCE0E-F18A-45E1-8711-E65600171542}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0153A0E1-A883-4EA0-A7F5-D90F4AF09E30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0153A0E1-A883-4EA0-A7F5-D90F4AF09E30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0153A0E1-A883-4EA0-A7F5-D90F4AF09E30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0153A0E1-A883-4EA0-A7F5-D90F4AF09E30}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6F8FCE0E-F18A-45E1-8711-E65600171542} = {A88963B6-8805-4AAA-89AD-9882FB002E2C}
+		{0153A0E1-A883-4EA0-A7F5-D90F4AF09E30} = {53876B3D-4E5B-454E-9486-2888648A23C0}
+	EndGlobalSection
+EndGlobal

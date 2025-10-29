@@ -1,0 +1,682 @@
+openapi: 3.0.3
+info:
+  title: DriftRide API
+  description: |
+    # DriftRide Queue Management System API
+
+    The DriftRide API provides comprehensive queue management functionality with real-time updates, authentication, and role-based access control.
+
+    ## Features
+    - JWT Bearer Token authentication
+    - Real-time queue updates via SignalR
+    - Role-based authorization (Sales, Driver)
+    - Comprehensive error handling
+    - Standard response format across all endpoints
+
+    ## Authentication
+    All endpoints (except login) require a valid JWT Bearer token. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your-jwt-token>
+    ```
+
+    ## Response Format
+    All API responses follow a consistent format:
+    ```json
+    {
+      "success": true|false,
+      "message": "Description of the operation",
+      "data": { /* Response data */ },
+      "error": { /* Error details if success=false */ }
+    }
+    ```
+
+    ## Roles
+    - **Sales**: Can manage customers, queues, and payments
+    - **Driver**: Can view queue status and update their availability
+
+    ## Real-time Updates
+    The API supports real-time updates via SignalR at `/queueHub`. Clients can subscribe to queue updates, position changes, and notifications.
+  version: 1.0.0
+  contact:
+    name: DriftRide Support
+    email: support@driftride.com
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000
+    description: Development server
+  - url: https://api.driftride.com
+    description: Production server
+
+paths:
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user and receive JWT token
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/customers:
+    get:
+      tags:
+        - Customers
+      summary: Get all customers
+      description: Retrieve a paginated list of customers
+      operationId: getCustomers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customers retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedCustomerResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Customers
+      summary: Create new customer
+      description: Create a new customer record
+      operationId: createCustomer
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Customer'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/queue:
+    get:
+      tags:
+        - Queue
+      summary: Get queue status
+      description: Get current queue entries with real-time position updates
+      operationId: getQueue
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Queue retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/QueueEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Queue
+      summary: Add customer to queue
+      description: Add a customer to the waiting queue
+      operationId: addToQueue
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToQueueRequest'
+      responses:
+        '201':
+          description: Customer added to queue successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/QueueEntry'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT Authorization header using the Bearer scheme.
+
+        **How to use:**
+        1. Login via `/api/auth/login` to get your JWT token
+        2. Include the token in the Authorization header for all requests
+        3. Format: `Bearer <your-jwt-token>`
+
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+        message:
+          type: string
+          description: Human-readable message describing the result
+        data:
+          type: object
+          nullable: true
+          description: Response data (null for error responses)
+        error:
+          $ref: '#/components/schemas/ErrorResponse'
+          nullable: true
+      required:
+        - success
+        - message
+
+    PagedResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApiResponse'
+        - type: object
+          properties:
+            totalCount:
+              type: integer
+              description: Total number of items across all pages
+            page:
+              type: integer
+              description: Current page number (1-based)
+            pageSize:
+              type: integer
+              description: Number of items per page
+            totalPages:
+              type: integer
+              description: Total number of pages
+          required:
+            - totalCount
+            - page
+            - pageSize
+            - totalPages
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code
+          enum:
+            - BAD_REQUEST
+            - UNAUTHORIZED
+            - FORBIDDEN
+            - NOT_FOUND
+            - CONFLICT
+            - VALIDATION_FAILED
+            - BUSINESS_RULE_VIOLATION
+            - INTERNAL_SERVER_ERROR
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          nullable: true
+          description: Additional error details (e.g., validation errors)
+      required:
+        - code
+        - message
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: User's username
+          example: johndoe
+        password:
+          type: string
+          description: User's password
+          format: password
+          example: SecurePassword123!
+      required:
+        - username
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        expiresAt:
+          type: string
+          format: date-time
+          description: Token expiration timestamp
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+        - token
+        - expiresAt
+        - user
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique user identifier
+          example: 1
+        username:
+          type: string
+          description: User's unique username
+          example: johndoe
+        displayName:
+          type: string
+          description: User's display name
+          example: John Doe
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: john.doe@example.com
+        role:
+          type: string
+          enum: [Sales, Driver]
+          description: User's role in the system
+        isActive:
+          type: boolean
+          description: Whether the user account is active
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Last login timestamp
+      required:
+        - id
+        - username
+        - displayName
+        - email
+        - role
+        - isActive
+        - createdAt
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique customer identifier
+          example: 1
+        name:
+          type: string
+          description: Customer's full name
+          example: John Doe
+        email:
+          type: string
+          format: email
+          description: Customer's email address
+          example: john.doe@example.com
+        phone:
+          type: string
+          description: Customer's phone number
+          example: +1-555-123-4567
+        isActive:
+          type: boolean
+          description: Whether the customer account is active
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+      required:
+        - id
+        - name
+        - email
+        - isActive
+        - createdAt
+
+    CreateCustomerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Customer's full name
+          example: John Doe
+        email:
+          type: string
+          format: email
+          description: Customer's email address
+          example: john.doe@example.com
+        phone:
+          type: string
+          description: Customer's phone number
+          example: +1-555-123-4567
+      required:
+        - name
+        - email
+
+    QueueEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique queue entry identifier
+          example: 1
+        customerId:
+          type: integer
+          description: Customer's unique identifier
+          example: 123
+        customerName:
+          type: string
+          description: Customer's full name
+          example: John Doe
+        position:
+          type: integer
+          description: Current position in queue (1-based)
+          example: 5
+        estimatedWaitTime:
+          type: string
+          format: time
+          description: Estimated wait time (HH:MM:SS)
+          example: "00:15:00"
+        actualWaitTime:
+          type: string
+          format: time
+          nullable: true
+          description: Actual wait time once called (HH:MM:SS)
+        status:
+          type: string
+          enum: [Waiting, Called, InProgress, Completed, Cancelled]
+          description: Current status of the queue entry
+        priority:
+          type: string
+          enum: [Low, Normal, High, Urgent]
+          description: Priority level
+          default: Normal
+        joinedAt:
+          type: string
+          format: date-time
+          description: Timestamp when customer joined the queue
+        calledAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when customer was called
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when service was completed
+      required:
+        - id
+        - customerId
+        - customerName
+        - position
+        - estimatedWaitTime
+        - status
+        - priority
+        - joinedAt
+
+    AddToQueueRequest:
+      type: object
+      properties:
+        customerId:
+          type: integer
+          description: Customer's unique identifier
+          example: 123
+        priority:
+          type: string
+          enum: [Low, Normal, High, Urgent]
+          description: Priority level for the queue entry
+          default: Normal
+        notes:
+          type: string
+          description: Optional notes about the service request
+          example: Customer needs assistance with account setup
+      required:
+        - customerId
+
+    PagedCustomerResponse:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/Customer'
+
+  responses:
+    BadRequest:
+      description: Bad Request - Invalid request data or parameters
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  error:
+                    $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized - JWT token is missing, invalid, or expired
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  message:
+                    example: You are not authorized to perform this action
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        example: UNAUTHORIZED
+                      message:
+                        example: JWT token is missing, invalid, or expired
+
+    Forbidden:
+      description: Forbidden - User does not have the required role or permissions
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  message:
+                    example: You do not have permission to access this resource
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        example: FORBIDDEN
+                      message:
+                        example: User does not have the required role or permissions
+
+    NotFound:
+      description: Not Found - The requested resource was not found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        example: NOT_FOUND
+                      message:
+                        example: Resource with identifier '123' was not found
+
+    Conflict:
+      description: Conflict - Resource already exists or operation conflicts with current state
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        example: CONFLICT
+                      message:
+                        example: A resource with this identifier already exists
+
+    UnprocessableEntity:
+      description: Unprocessable Entity - Request data is valid but business rules prevent processing
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        example: BUSINESS_RULE_VIOLATION
+                      message:
+                        example: Cannot process request due to business rules
+
+    InternalServerError:
+      description: Internal Server Error - An unexpected error occurred
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  success:
+                    example: false
+                  message:
+                    example: An internal server error occurred
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        example: INTERNAL_SERVER_ERROR
+                      message:
+                        example: An unexpected error occurred while processing your request
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Customers
+    description: Customer management operations
+  - name: Queue
+    description: Queue management and real-time updates
+  - name: Payments
+    description: Payment processing and history
+  - name: Users
+    description: User management (admin only)

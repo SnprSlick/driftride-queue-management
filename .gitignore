@@ -1,0 +1,123 @@
+# DriftRide Queue Management System - Git Ignore
+
+# Node.js Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# .NET Dependencies
+bin/
+obj/
+*.dll
+*.pdb
+*.cache
+*.nuget
+.vs/
+.vscode/
+*.user
+*.suo
+*.userprefs
+packages/
+
+# Build Outputs
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Environment Files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+appsettings.Development.json
+appsettings.*.json
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE Files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Runtime Files
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage Reports
+coverage/
+*.lcov
+
+# Database Files
+*.db
+*.sqlite
+*.mdf
+*.ldf
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Backup Files
+*.bak
+*.backup
+
+# Publish Profiles
+PublishProfiles/
+
+# NuGet Packages
+*.nupkg
+# Don't ignore .nuget folder if it contains packages.config
+!.nuget/packages.config
+
+# Entity Framework Migrations (optional - comment out if needed)
+# Migrations/
+
+# Test Results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Rider
+.idea/
+*.sln.iml
+
+# MacOS
+.AppleDouble
+.LSOverride
+
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# JetBrains
+.idea/
+*.iml
+*.ipr
+*.iws

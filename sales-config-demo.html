@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriftRide - Sales Payment Configuration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .config-panel {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            background: #4a5568;
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-enabled {
+            background: #48bb78;
+            color: white;
+        }
+
+        .status-disabled {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .panel-content {
+            padding: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="url"],
+        input[type="password"] {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="url"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #38a169;
+        }
+
+        .validation-info {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .validation-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .validation-success {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #276749;
+        }
+
+        .validation-error {
+            background: #fed7d7;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+        }
+
+        .validation-warning {
+            background: #fefcbf;
+            border: 1px solid #f6e05e;
+            color: #744210;
+        }
+
+        .api-test-result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .test-success {
+            background: #f0fff4;
+            border-color: #9ae6b4;
+        }
+
+        .test-failure {
+            background: #fed7d7;
+            border-color: #feb2b2;
+        }
+
+        .test-pending {
+            background: #fefcbf;
+            border-color: #f6e05e;
+        }
+
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .keyboard-shortcuts {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .shortcut {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+
+        .key {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏎️ DriftRide Sales Configuration</h1>
+            <p>Payment Method Configuration & Management</p>
+        </div>
+
+        <div class="statistics">
+            <div class="stat-card">
+                <div class="stat-value" id="enabledCount">3</div>
+                <div class="stat-label">Enabled Methods</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalRevenue">$1,247.50</div>
+                <div class="stat-label">Today's Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgPrice">$25.00</div>
+                <div class="stat-label">Average Price</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="apiIntegrations">2</div>
+                <div class="stat-label">API Integrations</div>
+            </div>
+        </div>
+
+        <!-- CashApp Configuration -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <h2>💰 CashApp Payment</h2>
+                <span class="status-badge status-enabled">Enabled</span>
+            </div>
+            <div class="panel-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cashapp-display">Display Name</label>
+                        <input type="text" id="cashapp-display" value="CashApp Payment" />
+                    </div>
+                    <div class="form-group">
+                        <label for="cashapp-price">Price per Ride</label>
+                        <input type="number" id="cashapp-price" value="25.00" step="0.01" min="0" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="cashapp-url">Payment URL</label>
+                        <input type="url" id="cashapp-url" value="https://cash.app/$driftride" />
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="cashapp-enabled" checked />
+                    <label for="cashapp-enabled">Enable for customers</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="cashapp-api" checked />
+                    <label for="cashapp-api">Enable API integration for automatic verification</label>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="cashapp-credentials">API Credentials</label>
+                    <input type="password" id="cashapp-credentials" value="pk_live_..." placeholder="Enter API credentials" />
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="saveConfiguration('cashapp')">
+                        💾 Save Configuration
+                    </button>
+                    <button class="btn btn-secondary" onclick="validateConfiguration('cashapp')">
+                        ✅ Validate
+                    </button>
+                    <button class="btn btn-success" onclick="testApiIntegration('cashapp')">
+                        🔧 Test API
+                    </button>
+                </div>
+
+                <div class="validation-info">
+                    <strong>Configuration Validation:</strong>
+                    <div id="cashapp-validation" class="validation-result validation-success">
+                        ✅ Configuration is valid. All required fields are properly configured.
+                    </div>
+                </div>
+
+                <div id="cashapp-test-result" class="api-test-result test-success" style="display: none;">
+                    <strong>🔧 API Test Result:</strong>
+                    <div>✅ CashApp API connection successful (Response time: 445ms)</div>
+                    <div style="margin-top: 5px; font-size: 0.8rem; color: #6b7280;">
+                        Last tested: Just now | Test ID: ca_test_123456
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PayPal Configuration -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <h2>💳 PayPal Payment</h2>
+                <span class="status-badge status-enabled">Enabled</span>
+            </div>
+            <div class="panel-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="paypal-display">Display Name</label>
+                        <input type="text" id="paypal-display" value="PayPal Payment" />
+                    </div>
+                    <div class="form-group">
+                        <label for="paypal-price">Price per Ride</label>
+                        <input type="number" id="paypal-price" value="27.50" step="0.01" min="0" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="paypal-url">Payment URL</label>
+                        <input type="url" id="paypal-url" value="https://paypal.me/driftride" />
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="paypal-enabled" checked />
+                    <label for="paypal-enabled">Enable for customers</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="paypal-api" />
+                    <label for="paypal-api">Enable API integration for automatic verification</label>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="paypal-credentials">API Credentials</label>
+                    <input type="password" id="paypal-credentials" value="" placeholder="Enter PayPal API credentials" disabled />
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="saveConfiguration('paypal')">
+                        💾 Save Configuration
+                    </button>
+                    <button class="btn btn-secondary" onclick="validateConfiguration('paypal')">
+                        ✅ Validate
+                    </button>
+                    <button class="btn btn-secondary" onclick="testApiIntegration('paypal')" disabled>
+                        🔧 Test API
+                    </button>
+                </div>
+
+                <div class="validation-info">
+                    <strong>Configuration Validation:</strong>
+                    <div id="paypal-validation" class="validation-result validation-warning">
+                        ⚠️ PayPal typically requires a payment URL. API integration is disabled.
+                    </div>
+                </div>
+
+                <div id="paypal-test-result" class="api-test-result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Cash in Hand Configuration -->
+        <div class="config-panel">
+            <div class="panel-header">
+                <h2>💵 Cash in Hand</h2>
+                <span class="status-badge status-enabled">Enabled</span>
+            </div>
+            <div class="panel-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cash-display">Display Name</label>
+                        <input type="text" id="cash-display" value="Cash Payment" />
+                    </div>
+                    <div class="form-group">
+                        <label for="cash-price">Price per Ride</label>
+                        <input type="number" id="cash-price" value="20.00" step="0.01" min="0" />
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="cash-url">Payment URL</label>
+                        <input type="url" id="cash-url" value="" placeholder="Not applicable for cash payments" disabled />
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="cash-enabled" checked />
+                    <label for="cash-enabled">Enable for customers</label>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="cash-api" disabled />
+                    <label for="cash-api">API integration not available for cash payments</label>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="saveConfiguration('cash')">
+                        💾 Save Configuration
+                    </button>
+                    <button class="btn btn-secondary" onclick="validateConfiguration('cash')">
+                        ✅ Validate
+                    </button>
+                </div>
+
+                <div class="validation-info">
+                    <strong>Configuration Validation:</strong>
+                    <div id="cash-validation" class="validation-result validation-success">
+                        ✅ Cash payment configuration is valid. No payment URL needed.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="keyboard-shortcuts">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <div class="shortcuts-grid">
+                <div class="shortcut">
+                    <span>Save Config</span>
+                    <span class="key">Ctrl+S</span>
+                </div>
+                <div class="shortcut">
+                    <span>Validate All</span>
+                    <span class="key">Ctrl+V</span>
+                </div>
+                <div class="shortcut">
+                    <span>Test APIs</span>
+                    <span class="key">Ctrl+T</span>
+                </div>
+                <div class="shortcut">
+                    <span>Refresh</span>
+                    <span class="key">F5</span>
+                </div>
+                <div class="shortcut">
+                    <span>Toggle All</span>
+                    <span class="key">Ctrl+A</span>
+                </div>
+                <div class="shortcut">
+                    <span>Help</span>
+                    <span class="key">F1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock payment configurations data
+        const paymentConfigurations = {
+            cashapp: {
+                paymentMethod: 'CashApp',
+                displayName: 'CashApp Payment',
+                paymentUrl: 'https://cash.app/$driftride',
+                isEnabled: true,
+                pricePerRide: 25.00,
+                apiIntegrationEnabled: true,
+                apiCredentials: 'pk_live_...'
+            },
+            paypal: {
+                paymentMethod: 'PayPal',
+                displayName: 'PayPal Payment',
+                paymentUrl: 'https://paypal.me/driftride',
+                isEnabled: true,
+                pricePerRide: 27.50,
+                apiIntegrationEnabled: false,
+                apiCredentials: ''
+            },
+            cash: {
+                paymentMethod: 'CashInHand',
+                displayName: 'Cash Payment',
+                paymentUrl: '',
+                isEnabled: true,
+                pricePerRide: 20.00,
+                apiIntegrationEnabled: false,
+                apiCredentials: ''
+            }
+        };
+
+        // Statistics tracking
+        let statistics = {
+            enabledCount: 3,
+            totalRevenue: 1247.50,
+            avgPrice: 24.17,
+            apiIntegrations: 2
+        };
+
+        function saveConfiguration(method) {
+            const config = paymentConfigurations[method];
+
+            // Get form values
+            config.displayName = document.getElementById(`${method}-display`).value;
+            config.pricePerRide = parseFloat(document.getElementById(`${method}-price`).value);
+            config.isEnabled = document.getElementById(`${method}-enabled`).checked;
+
+            if (method !== 'cash') {
+                config.paymentUrl = document.getElementById(`${method}-url`).value;
+                config.apiIntegrationEnabled = document.getElementById(`${method}-api`).checked;
+                config.apiCredentials = document.getElementById(`${method}-credentials`).value;
+            }
+
+            // Simulate API call
+            simulateApiCall(`Saving ${config.displayName} configuration...`, () => {
+                showNotification(`✅ ${config.displayName} configuration saved successfully!`, 'success');
+                updateStatistics();
+
+                // Auto-validate after saving
+                setTimeout(() => validateConfiguration(method), 500);
+            });
+        }
+
+        function validateConfiguration(method) {
+            const config = paymentConfigurations[method];
+            const validationElement = document.getElementById(`${method}-validation`);
+
+            // Simulate validation logic
+            let isValid = true;
+            let messages = [];
+            let warnings = [];
+
+            // Basic validation
+            if (!config.displayName || config.displayName.trim() === '') {
+                isValid = false;
+                messages.push('Display name is required');
+            }
+
+            if (config.pricePerRide < 0) {
+                isValid = false;
+                messages.push('Price cannot be negative');
+            } else if (config.pricePerRide === 0) {
+                warnings.push('Price is set to $0.00 - rides will be free');
+            }
+
+            // Method-specific validation
+            if (method === 'cashapp' || method === 'paypal') {
+                if (!config.paymentUrl || config.paymentUrl.trim() === '') {
+                    warnings.push(`${config.paymentMethod} typically requires a payment URL`);
+                }
+            }
+
+            if (method === 'cash' && config.paymentUrl && config.paymentUrl.trim() !== '') {
+                warnings.push('Cash-in-hand payments typically don\'t require a payment URL');
+            }
+
+            // Update UI
+            validationElement.className = 'validation-result';
+            if (!isValid) {
+                validationElement.className += ' validation-error';
+                validationElement.innerHTML = '❌ ' + messages.join(', ');
+            } else if (warnings.length > 0) {
+                validationElement.className += ' validation-warning';
+                validationElement.innerHTML = '⚠️ ' + warnings.join(', ');
+            } else {
+                validationElement.className += ' validation-success';
+                validationElement.innerHTML = '✅ Configuration is valid. All required fields are properly configured.';
+            }
+
+            showNotification(`Validation completed for ${config.displayName}`, isValid ? 'success' : 'error');
+        }
+
+        function testApiIntegration(method) {
+            const config = paymentConfigurations[method];
+            const testResultElement = document.getElementById(`${method}-test-result`);
+
+            if (!config.apiIntegrationEnabled) {
+                showNotification(`API integration is disabled for ${config.displayName}`, 'warning');
+                return;
+            }
+
+            // Show pending state
+            testResultElement.style.display = 'block';
+            testResultElement.className = 'api-test-result test-pending';
+            testResultElement.innerHTML = `
+                <strong>🔧 API Test in Progress:</strong>
+                <div>Testing ${config.displayName} API connection...</div>
+            `;
+
+            // Simulate API test
+            simulateApiCall(`Testing ${config.displayName} API integration...`, () => {
+                const isSuccessful = Math.random() > 0.2; // 80% success rate
+                const responseTime = Math.floor(Math.random() * 500) + 200;
+
+                testResultElement.className = `api-test-result ${isSuccessful ? 'test-success' : 'test-failure'}`;
+
+                if (isSuccessful) {
+                    testResultElement.innerHTML = `
+                        <strong>🔧 API Test Result:</strong>
+                        <div>✅ ${config.displayName} API connection successful (Response time: ${responseTime}ms)</div>
+                        <div style="margin-top: 5px; font-size: 0.8rem; color: #6b7280;">
+                            Last tested: Just now | Test ID: ${method}_test_${Date.now()}
+                        </div>
+                    `;
+                    showNotification(`${config.displayName} API test successful!`, 'success');
+                } else {
+                    testResultElement.innerHTML = `
+                        <strong>🔧 API Test Result:</strong>
+                        <div>❌ ${config.displayName} API connection failed</div>
+                        <div style="margin-top: 5px; font-size: 0.8rem; color: #c53030;">
+                            Error: Invalid API credentials or service unavailable
+                        </div>
+                    `;
+                    showNotification(`${config.displayName} API test failed`, 'error');
+                }
+            }, Math.floor(Math.random() * 1000) + 500);
+        }
+
+        function updateStatistics() {
+            // Recalculate statistics
+            const enabled = Object.values(paymentConfigurations).filter(c => c.isEnabled).length;
+            const apiEnabled = Object.values(paymentConfigurations).filter(c => c.apiIntegrationEnabled).length;
+            const avgPrice = Object.values(paymentConfigurations)
+                .reduce((sum, c) => sum + c.pricePerRide, 0) / Object.keys(paymentConfigurations).length;
+
+            statistics.enabledCount = enabled;
+            statistics.apiIntegrations = apiEnabled;
+            statistics.avgPrice = avgPrice;
+
+            // Update UI
+            document.getElementById('enabledCount').textContent = statistics.enabledCount;
+            document.getElementById('avgPrice').textContent = `$${statistics.avgPrice.toFixed(2)}`;
+            document.getElementById('apiIntegrations').textContent = statistics.apiIntegrations;
+        }
+
+        function simulateApiCall(message, callback, delay = 1000) {
+            showNotification(message, 'info');
+            setTimeout(callback, delay);
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                max-width: 400px;
+                transform: translateX(500px);
+                transition: transform 0.3s ease;
+            `;
+
+            // Set colors based on type
+            switch (type) {
+                case 'success':
+                    notification.style.background = '#48bb78';
+                    break;
+                case 'error':
+                    notification.style.background = '#e53e3e';
+                    break;
+                case 'warning':
+                    notification.style.background = '#ed8936';
+                    break;
+                default:
+                    notification.style.background = '#4299e1';
+            }
+
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Remove after delay
+            setTimeout(() => {
+                notification.style.transform = 'translateX(500px)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 's':
+                        e.preventDefault();
+                        saveConfiguration('cashapp');
+                        saveConfiguration('paypal');
+                        saveConfiguration('cash');
+                        break;
+                    case 'v':
+                        e.preventDefault();
+                        validateConfiguration('cashapp');
+                        validateConfiguration('paypal');
+                        validateConfiguration('cash');
+                        break;
+                    case 't':
+                        e.preventDefault();
+                        testApiIntegration('cashapp');
+                        testApiIntegration('paypal');
+                        break;
+                    case 'a':
+                        e.preventDefault();
+                        // Toggle all enabled states
+                        const allEnabled = Object.values(paymentConfigurations).every(c => c.isEnabled);
+                        Object.keys(paymentConfigurations).forEach(method => {
+                            document.getElementById(`${method}-enabled`).checked = !allEnabled;
+                        });
+                        break;
+                }
+            } else if (e.key === 'F5') {
+                e.preventDefault();
+                location.reload();
+            } else if (e.key === 'F1') {
+                e.preventDefault();
+                showNotification('🎯 Sales Configuration Help: Use keyboard shortcuts for faster configuration management!', 'info');
+            }
+        });
+
+        // Initialize API integration toggles
+        document.getElementById('paypal-api').addEventListener('change', function() {
+            const credentialsField = document.getElementById('paypal-credentials');
+            const testButton = document.querySelector('[onclick="testApiIntegration(\'paypal\')"]');
+
+            credentialsField.disabled = !this.checked;
+            testButton.disabled = !this.checked;
+
+            if (!this.checked) {
+                credentialsField.value = '';
+                document.getElementById('paypal-test-result').style.display = 'none';
+            }
+        });
+
+        // Initialize page
+        updateStatistics();
+        showNotification('🏎️ Sales Configuration Panel loaded successfully!', 'success');
+    </script>
+</body>
+</html>

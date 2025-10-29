@@ -1,0 +1,438 @@
+@model DriverDashboardViewModel
+
+@{
+    ViewData["Title"] = "Driver Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="driver-dashboard">
+    <!-- Header with Status -->
+    <div class="driver-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="dashboard-title">
+                        <i class="fas fa-car-side"></i>
+                        Driver Dashboard
+                    </h1>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="connection-status">
+                        <span id="connectionStatus" class="status-indicator connecting">
+                            <i class="fas fa-circle"></i>
+                            <span id="connectionText">@Model.ConnectionStatus</span>
+                        </span>
+                        <small class="text-muted d-block">
+                            Last updated: <span id="lastUpdated">@Model.LastUpdated.ToString("h:mm:ss tt")</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Current Customer Card -->
+            <div class="col-lg-8">
+                <div class="current-customer-card">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-user-clock"></i>
+                                Current Customer
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <div id="currentCustomerContent">
+                                @if (Model.CurrentCustomer != null)
+                                {
+                                    <partial name="_CurrentCustomer" model="Model.CurrentCustomer" />
+                                }
+                                else
+                                {
+                                    <div class="no-customers text-center py-5">
+                                        <i class="fas fa-hourglass-end fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">No customers in queue</h5>
+                                        <p class="text-muted">Waiting for customers to join the queue...</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions mt-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3">
+                                    <button id="completeRideBtn" class="btn btn-success btn-lg w-100" disabled>
+                                        <i class="fas fa-check-circle"></i>
+                                        <div>Complete Ride</div>
+                                        <small>Space or Enter</small>
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <button id="refreshBtn" class="btn btn-outline-primary btn-lg w-100">
+                                        <i class="fas fa-sync-alt"></i>
+                                        <div>Refresh</div>
+                                        <small>F5</small>
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <button id="emergencyBtn" class="btn btn-outline-warning btn-lg w-100">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <div>Need Help</div>
+                                        <small>F1</small>
+                                    </button>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="session-stats">
+                                        <div class="stat-value">@Model.SessionStats.RidesCompleted</div>
+                                        <div class="stat-label">Rides Today</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Queue Preview Sidebar -->
+            <div class="col-lg-4">
+                <div class="queue-sidebar">
+                    <!-- Queue Stats -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list-ol"></i>
+                                Queue Status
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="queue-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number" id="queueLength">@Model.QueueLength</div>
+                                    <div class="stat-description">Customers Waiting</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Customers -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-clock"></i>
+                                Next Up
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="upcomingCustomers" class="upcoming-list">
+                                @if (Model.UpcomingCustomers.Any())
+                                {
+                                    @foreach (var customer in Model.UpcomingCustomers.Take(3))
+                                    {
+                                        <div class="upcoming-customer-item">
+                                            <div class="customer-info">
+                                                <div class="customer-name">
+                                                    @customer.DisplayName
+                                                    @if (customer.CustomerName != customer.DisplayName)
+                                                    {
+                                                        <small class="text-muted">(@customer.ArrivalTimeDisplay)</small>
+                                                    }
+                                                </div>
+                                                <div class="customer-details">
+                                                    <span class="position-badge">Position @customer.Position</span>
+                                                    <span class="wait-time @(customer.IsWaitingLong ? "long-wait" : "")">
+                                                        @customer.WaitTimeDisplay
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="no-upcoming text-center p-3">
+                                        <i class="fas fa-inbox text-muted"></i>
+                                        <p class="text-muted mb-0">No upcoming customers</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Completion Confirmation Modal -->
+<div class="modal fade" id="completionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle"></i>
+                    Ride Completed
+                </h5>
+            </div>
+            <div class="modal-body text-center">
+                <div class="completion-success">
+                    <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                    <h4 id="completedCustomerName">Ride completed successfully!</h4>
+                    <p class="text-muted">Moving to next customer...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles -->
+<style>
+.driver-dashboard {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding-bottom: 2rem;
+}
+
+.driver-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+.dashboard-title {
+    color: white;
+    font-weight: 600;
+    margin: 0;
+}
+
+.connection-status {
+    color: white;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.status-indicator.connected {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.status-indicator.connecting {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.status-indicator.disconnected {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.current-customer-card {
+    min-height: 300px;
+}
+
+.current-customer-display {
+    text-align: center;
+    padding: 2rem;
+}
+
+.customer-name-large {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.customer-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.detail-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.detail-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.complete-ride-btn {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border: none;
+    font-size: 1.5rem;
+    padding: 1rem 3rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+    transition: all 0.3s ease;
+}
+
+.complete-ride-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
+}
+
+.quick-actions .btn {
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.session-stats {
+    text-align: center;
+    padding: 1rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.queue-stats .stat-item {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #17a2b8;
+}
+
+.stat-description {
+    color: #6c757d;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+}
+
+.upcoming-customer-item {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.upcoming-customer-item:hover {
+    background: #f8f9fa;
+}
+
+.upcoming-customer-item:last-child {
+    border-bottom: none;
+}
+
+.customer-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.customer-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.position-badge {
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.wait-time {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.wait-time.long-wait {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.no-customers, .no-upcoming {
+    color: #6c757d;
+}
+
+.disambiguation-time {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Responsive adjustments */
+@@media (max-width: 768px) {
+    .customer-name-large {
+        font-size: 2rem;
+    }
+
+    .customer-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .complete-ride-btn {
+        font-size: 1.25rem;
+        padding: 0.75rem 2rem;
+    }
+}
+
+/* Animation for completion */
+@@keyframes completionPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.completion-success {
+    animation: completionPulse 0.6s ease-in-out;
+}
+</style>
+
+<!-- Scripts -->
+<script src="~/js/driver-dashboard.js"></script>
+
+@section Scripts {
+    <script>
+        // Initialize driver dashboard when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof DriverDashboard !== 'undefined') {
+                const dashboard = new DriverDashboard();
+                dashboard.initialize();
+            }
+        });
+    </script>
+}

@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - Drift Car Queue System</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.min.js"></script>
+
+    <style>
+        .driver-dashboard {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding-bottom: 2rem;
+        }
+
+        .driver-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-title {
+            color: white;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .connection-status {
+            color: white;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .status-indicator.connected {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .status-indicator.connecting {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-indicator.disconnected {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .current-customer-card {
+            min-height: 400px;
+        }
+
+        .current-customer-display {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .customer-name-large {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .customer-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .detail-item {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .complete-ride-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            font-size: 1.5rem;
+            padding: 1.25rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .complete-ride-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(45deg, #218838, #1e7e34);
+            color: white;
+        }
+
+        .complete-ride-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .complete-ride-btn:focus {
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+            color: white;
+        }
+
+        .keyboard-hint kbd {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            color: #333;
+        }
+
+        .action-section {
+            padding-top: 2rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .queue-stats .stat-item {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #17a2b8;
+        }
+
+        .stat-description {
+            color: #6c757d;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        .upcoming-customer-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+
+        .upcoming-customer-item:hover {
+            background: #f8f9fa;
+        }
+
+        .upcoming-customer-item:last-child {
+            border-bottom: none;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .customer-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .position-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .wait-time {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .wait-time.long-wait {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .disambiguation-time {
+            font-size: 1rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .text-warning {
+            color: #ffc107 !important;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+
+        .no-customers {
+            color: #6c757d;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .customer-name-large {
+                font-size: 2rem;
+            }
+
+            .customer-details-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+            }
+
+            .detail-item {
+                padding: 1rem 0.75rem;
+            }
+
+            .detail-value {
+                font-size: 1.1rem;
+            }
+
+            .complete-ride-btn {
+                font-size: 1.25rem;
+                padding: 1rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .customer-details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Completion animation */
+        @keyframes completionPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .completion-success {
+            animation: completionPulse 0.6s ease-in-out;
+        }
+
+        .session-stats {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="driver-dashboard">
+        <!-- Header with Status -->
+        <div class="driver-header">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="dashboard-title">
+                            <i class="fas fa-car-side"></i>
+                            Driver Dashboard
+                        </h1>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <div class="connection-status">
+                            <span id="connectionStatus" class="status-indicator connected">
+                                <i class="fas fa-circle"></i>
+                                <span id="connectionText">Connected (Demo Mode)</span>
+                            </span>
+                            <small class="text-muted d-block">
+                                Last updated: <span id="lastUpdated">--:--:-- --</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Current Customer Card -->
+                <div class="col-lg-8">
+                    <div class="current-customer-card">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">
+                                    <i class="fas fa-user-clock"></i>
+                                    Current Customer
+                                </h4>
+                            </div>
+                            <div class="card-body p-4">
+                                <div id="currentCustomerContent">
+                                    <!-- Current customer will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions mt-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-md-3">
+                                        <button id="completeRideBtn" class="btn btn-success btn-lg w-100">
+                                            <i class="fas fa-check-circle"></i>
+                                            <div>Complete Ride</div>
+                                            <small>Space or Enter</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button id="refreshBtn" class="btn btn-outline-primary btn-lg w-100">
+                                            <i class="fas fa-sync-alt"></i>
+                                            <div>Refresh</div>
+                                            <small>F5</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button id="emergencyBtn" class="btn btn-outline-warning btn-lg w-100">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <div>Need Help</div>
+                                            <small>F1</small>
+                                        </button>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="session-stats">
+                                            <div class="stat-value" id="ridesCompleted">7</div>
+                                            <div class="stat-label">Rides Today</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Queue Preview Sidebar -->
+                <div class="col-lg-4">
+                    <div class="queue-sidebar">
+                        <!-- Queue Stats -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list-ol"></i>
+                                    Queue Status
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="queue-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-number" id="queueLength">4</div>
+                                        <div class="stat-description">Customers Waiting</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upcoming Customers -->
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-clock"></i>
+                                    Next Up
+                                </h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="upcomingCustomers" class="upcoming-list">
+                                    <!-- Upcoming customers will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completion Confirmation Modal -->
+    <div class="modal fade" id="completionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle"></i>
+                        Ride Completed
+                    </h5>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="completion-success">
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                        <h4 id="completedCustomerName">Ride completed successfully!</h4>
+                        <p class="text-muted">Moving to next customer...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Mock data for demonstration
+        const mockCustomers = [
+            {
+                queueEntryId: '123e4567-e89b-12d3-a456-426614174000',
+                customerId: '123e4567-e89b-12d3-a456-426614174001',
+                customerName: 'Mike Johnson',
+                displayName: 'Mike Johnson',
+                phoneNumber: '555-0123',
+                position: 1,
+                paymentMethod: 'CashApp',
+                paymentAmount: 25.00,
+                queuedAt: new Date(Date.now() - 8 * 60000), // 8 minutes ago
+                arrivalTimeDisplay: '2:15 PM'
+            },
+            {
+                queueEntryId: '123e4567-e89b-12d3-a456-426614174002',
+                customerId: '123e4567-e89b-12d3-a456-426614174003',
+                customerName: 'Sarah Smith',
+                displayName: 'Sarah Smith',
+                phoneNumber: '555-0124',
+                position: 2,
+                paymentMethod: 'PayPal',
+                paymentAmount: 25.00,
+                queuedAt: new Date(Date.now() - 5 * 60000), // 5 minutes ago
+                arrivalTimeDisplay: '2:18 PM'
+            },
+            {
+                queueEntryId: '123e4567-e89b-12d3-a456-426614174004',
+                customerId: '123e4567-e89b-12d3-a456-426614174005',
+                customerName: 'John Smith',
+                displayName: 'John Smith (arrived 2:20 PM)',
+                phoneNumber: '555-0125',
+                position: 3,
+                paymentMethod: 'CashInHand',
+                paymentAmount: 25.00,
+                queuedAt: new Date(Date.now() - 3 * 60000), // 3 minutes ago
+                arrivalTimeDisplay: '2:20 PM'
+            },
+            {
+                queueEntryId: '123e4567-e89b-12d3-a456-426614174006',
+                customerId: '123e4567-e89b-12d3-a456-426614174007',
+                customerName: 'John Smith',
+                displayName: 'John Smith (arrived 2:21 PM)',
+                phoneNumber: '555-0126',
+                position: 4,
+                paymentMethod: 'CashApp',
+                paymentAmount: 25.00,
+                queuedAt: new Date(Date.now() - 2 * 60000), // 2 minutes ago
+                arrivalTimeDisplay: '2:21 PM'
+            }
+        ];
+
+        let currentCustomerIndex = 0;
+        let ridesCompleted = 7;
+
+        class DriverDashboardDemo {
+            constructor() {
+                this.handleKeyPress = this.handleKeyPress.bind(this);
+                this.completeCurrentRide = this.completeCurrentRide.bind(this);
+                this.refreshDashboard = this.refreshDashboard.bind(this);
+            }
+
+            initialize() {
+                console.log('Initializing Driver Dashboard Demo...');
+
+                this.setupEventListeners();
+                this.setupKeyboardShortcuts();
+                this.loadCurrentCustomer();
+                this.loadUpcomingCustomers();
+                this.updateLastUpdated();
+                this.startAutoRefresh();
+
+                console.log('Driver Dashboard Demo initialized successfully');
+            }
+
+            setupEventListeners() {
+                document.addEventListener('click', (e) => {
+                    if (e.target.id === 'completeCurrentRideBtn' || e.target.closest('#completeCurrentRideBtn')) {
+                        e.preventDefault();
+                        this.completeCurrentRide();
+                    }
+                });
+
+                const refreshBtn = document.getElementById('refreshBtn');
+                if (refreshBtn) {
+                    refreshBtn.addEventListener('click', () => this.refreshDashboard());
+                }
+
+                const emergencyBtn = document.getElementById('emergencyBtn');
+                if (emergencyBtn) {
+                    emergencyBtn.addEventListener('click', () => this.handleEmergency());
+                }
+            }
+
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', this.handleKeyPress);
+            }
+
+            handleKeyPress(event) {
+                if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                    return;
+                }
+
+                switch (event.key) {
+                    case ' ':
+                    case 'Enter':
+                        event.preventDefault();
+                        this.completeCurrentRide();
+                        break;
+                    case 'F5':
+                        event.preventDefault();
+                        this.refreshDashboard();
+                        break;
+                    case 'F1':
+                        event.preventDefault();
+                        this.handleEmergency();
+                        break;
+                    case 'Escape':
+                        event.preventDefault();
+                        this.clearNotifications();
+                        break;
+                }
+            }
+
+            loadCurrentCustomer() {
+                const container = document.getElementById('currentCustomerContent');
+                if (!container) return;
+
+                if (currentCustomerIndex < mockCustomers.length) {
+                    const customer = mockCustomers[currentCustomerIndex];
+                    const customerHtml = this.buildCurrentCustomerHtml(customer);
+                    container.innerHTML = customerHtml;
+                    this.updateCompleteButton(true);
+                } else {
+                    this.showNoCustomer();
+                    this.updateCompleteButton(false);
+                }
+            }
+
+            buildCurrentCustomerHtml(customer) {
+                const waitTime = this.calculateWaitTime(customer.queuedAt);
+                const isLongWait = waitTime.totalMinutes > 10;
+                const isVeryLongWait = waitTime.totalMinutes > 20;
+
+                return `
+                    <div class="current-customer-display" data-queue-entry-id="${customer.queueEntryId}">
+                        <div class="customer-name-section">
+                            <h2 class="customer-name-large">${customer.customerName}</h2>
+                            ${customer.customerName !== customer.displayName ?
+                                `<div class="disambiguation-time">
+                                    <i class="fas fa-clock"></i>
+                                    Arrived at ${customer.arrivalTimeDisplay}
+                                </div>` : ''}
+                        </div>
+
+                        <div class="customer-details-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">Position</div>
+                                <div class="detail-value">#${customer.position}</div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Wait Time</div>
+                                <div class="detail-value ${isLongWait ? 'text-warning' : ''} ${isVeryLongWait ? 'text-danger' : ''}">
+                                    ${waitTime.display}
+                                    ${isVeryLongWait ? '<i class="fas fa-exclamation-triangle text-danger ms-1"></i>' : ''}
+                                </div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-label">Payment</div>
+                                <div class="detail-value">
+                                    ${customer.paymentMethod}
+                                    <small class="d-block text-muted">$${customer.paymentAmount.toFixed(2)}</small>
+                                </div>
+                            </div>
+
+                            ${customer.phoneNumber ? `
+                                <div class="detail-item">
+                                    <div class="detail-label">Contact</div>
+                                    <div class="detail-value">
+                                        <a href="tel:${customer.phoneNumber}" class="text-decoration-none">
+                                            <i class="fas fa-phone"></i>
+                                            ${customer.phoneNumber}
+                                        </a>
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        ${isVeryLongWait ? `
+                            <div class="alert alert-warning text-center">
+                                <i class="fas fa-clock"></i>
+                                <strong>Extended Wait Time:</strong> This customer has been waiting over 20 minutes.
+                                Consider prioritizing or checking for issues.
+                            </div>
+                        ` : isLongWait ? `
+                            <div class="alert alert-info text-center">
+                                <i class="fas fa-info-circle"></i>
+                                Customer has been waiting over 10 minutes.
+                            </div>
+                        ` : ''}
+
+                        <div class="action-section mt-4">
+                            <button id="completeCurrentRideBtn"
+                                    class="btn complete-ride-btn btn-lg w-100"
+                                    data-queue-entry-id="${customer.queueEntryId}"
+                                    data-customer-name="${customer.customerName}">
+                                <i class="fas fa-check-circle"></i>
+                                Complete Ride for ${customer.customerName}
+                            </button>
+
+                            <div class="keyboard-hint text-center mt-2">
+                                <small class="text-muted">
+                                    Press <kbd>Space</kbd> or <kbd>Enter</kbd> to complete ride
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showNoCustomer() {
+                const container = document.getElementById('currentCustomerContent');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="no-customers text-center py-5">
+                            <i class="fas fa-hourglass-end fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No customers in queue</h5>
+                            <p class="text-muted">Waiting for customers to join the queue...</p>
+                        </div>
+                    `;
+                }
+            }
+
+            loadUpcomingCustomers() {
+                const container = document.getElementById('upcomingCustomers');
+                if (!container) return;
+
+                const upcomingCustomers = mockCustomers
+                    .slice(currentCustomerIndex + 1, currentCustomerIndex + 4)
+                    .map((customer, index) => ({
+                        ...customer,
+                        position: index + 2 // Adjust position for upcoming customers
+                    }));
+
+                if (upcomingCustomers.length > 0) {
+                    container.innerHTML = upcomingCustomers
+                        .map(customer => this.buildUpcomingCustomerHtml(customer))
+                        .join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="no-upcoming text-center p-3">
+                            <i class="fas fa-inbox text-muted"></i>
+                            <p class="text-muted mb-0">No upcoming customers</p>
+                        </div>
+                    `;
+                }
+
+                // Update queue length
+                const queueLengthEl = document.getElementById('queueLength');
+                if (queueLengthEl) {
+                    queueLengthEl.textContent = Math.max(0, mockCustomers.length - currentCustomerIndex);
+                }
+            }
+
+            buildUpcomingCustomerHtml(customer) {
+                const waitTime = this.calculateWaitTime(customer.queuedAt);
+                const isLongWait = waitTime.totalMinutes > 10;
+
+                return `
+                    <div class="upcoming-customer-item">
+                        <div class="customer-info">
+                            <div class="customer-name">
+                                ${customer.displayName}
+                            </div>
+                            <div class="customer-details">
+                                <span class="position-badge">Position ${customer.position}</span>
+                                <span class="wait-time ${isLongWait ? 'long-wait' : ''}">
+                                    ${waitTime.display}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            calculateWaitTime(queuedAt) {
+                const now = new Date();
+                const queued = new Date(queuedAt);
+                const diffMs = now - queued;
+                const diffMinutes = Math.floor(diffMs / 60000);
+
+                let display;
+                if (diffMinutes < 1) {
+                    display = "< 1 min";
+                } else if (diffMinutes < 60) {
+                    display = `${diffMinutes} min`;
+                } else {
+                    const hours = Math.floor(diffMinutes / 60);
+                    const mins = diffMinutes % 60;
+                    display = `${hours}h ${mins}m`;
+                }
+
+                return {
+                    totalMinutes: diffMinutes,
+                    display: display
+                };
+            }
+
+            updateCompleteButton(enabled) {
+                const btn = document.getElementById('completeRideBtn');
+                if (btn) {
+                    btn.disabled = !enabled;
+                }
+
+                const currentBtn = document.getElementById('completeCurrentRideBtn');
+                if (currentBtn) {
+                    currentBtn.disabled = !enabled;
+                }
+            }
+
+            async completeCurrentRide() {
+                if (currentCustomerIndex >= mockCustomers.length) {
+                    alert('No customer to complete');
+                    return;
+                }
+
+                const customer = mockCustomers[currentCustomerIndex];
+                const completeBtn = document.getElementById('completeCurrentRideBtn');
+
+                if (completeBtn) {
+                    completeBtn.disabled = true;
+                    completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
+                }
+
+                // Simulate API call delay
+                setTimeout(() => {
+                    ridesCompleted++;
+                    currentCustomerIndex++;
+
+                    // Update rides completed counter
+                    const ridesCompletedEl = document.getElementById('ridesCompleted');
+                    if (ridesCompletedEl) {
+                        ridesCompletedEl.textContent = ridesCompleted;
+                    }
+
+                    // Show completion modal
+                    this.showCompletionModal(customer.customerName);
+
+                    // Auto-refresh to get next customer
+                    setTimeout(() => {
+                        this.loadCurrentCustomer();
+                        this.loadUpcomingCustomers();
+                        this.updateLastUpdated();
+                    }, 1500);
+
+                    this.showNotification('Ride completed successfully!', 'success');
+
+                }, 1000);
+            }
+
+            showCompletionModal(customerName) {
+                const modal = document.getElementById('completionModal');
+                const nameEl = document.getElementById('completedCustomerName');
+
+                if (modal && nameEl) {
+                    nameEl.textContent = `${customerName}'s ride completed!`;
+
+                    const modalInstance = new bootstrap.Modal(modal);
+                    modalInstance.show();
+
+                    // Auto-hide after 2 seconds
+                    setTimeout(() => modalInstance.hide(), 2000);
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                console.log(`${type.toUpperCase()}: ${message}`);
+                // You could integrate with a toast library here
+            }
+
+            handleEmergency() {
+                alert('Emergency assistance requested! Sales staff have been notified.');
+            }
+
+            clearNotifications() {
+                console.log('Notifications cleared');
+            }
+
+            updateLastUpdated() {
+                const lastUpdatedEl = document.getElementById('lastUpdated');
+                if (lastUpdatedEl) {
+                    lastUpdatedEl.textContent = new Date().toLocaleTimeString();
+                }
+            }
+
+            refreshDashboard() {
+                console.log('Refreshing dashboard...');
+                this.loadCurrentCustomer();
+                this.loadUpcomingCustomers();
+                this.updateLastUpdated();
+                this.showNotification('Dashboard refreshed', 'success');
+            }
+
+            startAutoRefresh() {
+                setInterval(() => {
+                    this.updateLastUpdated();
+
+                    // Update wait times every 30 seconds
+                    this.loadCurrentCustomer();
+                    this.loadUpcomingCustomers();
+                }, 30000);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const dashboard = new DriverDashboardDemo();
+            dashboard.initialize();
+        });
+    </script>
+</body>
+</html>

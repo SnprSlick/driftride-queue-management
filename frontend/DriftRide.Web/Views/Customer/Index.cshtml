@@ -1,0 +1,222 @@
+@model CustomerViewModel
+@{
+    ViewData["Title"] = "Join the Drift Queue";
+}
+
+<div class="container-fluid px-2">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1 class="display-4 fw-bold text-primary">🏎️ Drift Ride</h1>
+                <p class="lead">Get ready for the ultimate drift experience!</p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="progress mb-4" style="height: 8px;">
+                <div class="progress-bar bg-success" id="progressBar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+
+            <!-- Step Indicators -->
+            <div class="row text-center mb-4">
+                <div class="col-3">
+                    <div class="step-circle active" id="step1Circle">1</div>
+                    <small class="d-block mt-1">Info</small>
+                </div>
+                <div class="col-3">
+                    <div class="step-circle" id="step2Circle">2</div>
+                    <small class="d-block mt-1">Payment</small>
+                </div>
+                <div class="col-3">
+                    <div class="step-circle" id="step3Circle">3</div>
+                    <small class="d-block mt-1">Confirm</small>
+                </div>
+                <div class="col-3">
+                    <div class="step-circle" id="step4Circle">4</div>
+                    <small class="d-block mt-1">Queue</small>
+                </div>
+            </div>
+
+            <!-- Main Content Card -->
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-4">
+                    <!-- Error Messages -->
+                    <div class="alert alert-danger d-none" id="errorAlert" role="alert">
+                        <ul class="mb-0" id="errorList"></ul>
+                    </div>
+
+                    <!-- Success Messages -->
+                    <div class="alert alert-success d-none" id="successAlert" role="alert">
+                        <span id="successMessage"></span>
+                    </div>
+
+                    <!-- Step 1: Customer Information -->
+                    <div class="step-content" id="step1Content">
+                        <h3 class="mb-3">Your Information</h3>
+                        <form id="customerForm">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label for="customerName" class="form-label fs-5">Full Name *</label>
+                                <input type="text" class="form-control form-control-lg" id="customerName"
+                                       placeholder="Enter your full name" required maxlength="100">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="customerPhone" class="form-label fs-5">Phone Number *</label>
+                                <input type="tel" class="form-control form-control-lg" id="customerPhone"
+                                       placeholder="(555) 123-4567" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <button type="button" class="btn btn-primary btn-lg w-100" id="nextToPaymentBtn">
+                                Continue to Payment <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Step 2: Payment Method Selection -->
+                    <div class="step-content d-none" id="step2Content">
+                        <h3 class="mb-3">Choose Payment Method</h3>
+                        <p class="text-muted mb-4">Select how you'd like to pay for your drift ride</p>
+
+                        <div class="price-display text-center mb-4">
+                            <h2 class="text-success fw-bold">$<span id="ridePrice">25.00</span></h2>
+                            <small class="text-muted">per ride</small>
+                        </div>
+
+                        <div class="payment-methods">
+                            <!-- Payment method options will be loaded dynamically -->
+                            <div class="payment-option d-none" id="paymentTemplate">
+                                <div class="card payment-card mb-3" data-method="">
+                                    <div class="card-body text-center p-3">
+                                        <div class="payment-icon mb-2">
+                                            <i class="payment-icon-img"></i>
+                                        </div>
+                                        <h5 class="card-title payment-name"></h5>
+                                        <p class="card-text payment-description text-muted"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary flex-fill" id="backToInfoBtn">
+                                <i class="fas fa-arrow-left me-2"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-primary flex-fill" id="proceedPaymentBtn" disabled>
+                                Proceed with Payment <i class="fas fa-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Payment Confirmation -->
+                    <div class="step-content d-none" id="step3Content">
+                        <h3 class="mb-3">Complete Your Payment</h3>
+
+                        <div class="payment-status-card">
+                            <div class="card bg-light mb-4">
+                                <div class="card-body text-center">
+                                    <div class="payment-app-instructions" id="paymentInstructions">
+                                        <!-- Instructions will be populated based on selected payment method -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="confirmation-section">
+                            <h5 class="mb-3">After completing payment:</h5>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="paymentCompletedCheck">
+                                <label class="form-check-label fs-6" for="paymentCompletedCheck">
+                                    I have completed the payment
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-secondary flex-fill" id="backToPaymentBtn">
+                                <i class="fas fa-arrow-left me-2"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-success flex-fill" id="confirmPaymentBtn" disabled>
+                                Confirm Payment <i class="fas fa-check ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Queue Status -->
+                    <div class="step-content d-none" id="step4Content">
+                        <div class="text-center">
+                            <div class="queue-status">
+                                <div class="spinner-border text-primary mb-3" role="status" id="queueSpinner">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <h3 class="mb-3" id="queueStatusTitle">Processing Your Payment...</h3>
+                                <p class="text-muted" id="queueStatusMessage">
+                                    Our sales team is verifying your payment. This usually takes just a moment.
+                                </p>
+                            </div>
+
+                            <div class="queue-position d-none" id="queuePositionDisplay">
+                                <div class="alert alert-success" role="alert">
+                                    <h4 class="alert-heading">🎉 You're in the queue!</h4>
+                                    <p class="mb-2">Your position: <strong class="fs-4 text-primary">#<span id="yourPosition">0</span></strong></p>
+                                    <hr>
+                                    <p class="mb-0">We'll update you in real-time as the queue moves. Get ready for an awesome ride!</p>
+                                </div>
+
+                                <div class="queue-info mt-3">
+                                    <p><strong>Estimated wait time:</strong> <span id="estimatedWait">Calculating...</span></p>
+                                    <p><strong>People ahead of you:</strong> <span id="peopleAhead">0</span></p>
+                                </div>
+                            </div>
+
+                            <div class="payment-denied d-none" id="paymentDeniedDisplay">
+                                <div class="alert alert-warning" role="alert">
+                                    <h4 class="alert-heading">⚠️ Payment Verification Issue</h4>
+                                    <p>We couldn't verify your payment. Please contact our sales team for assistance.</p>
+                                    <hr>
+                                    <button class="btn btn-outline-primary" onclick="location.href='/Customer'">Try Again</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    Need help? Contact our sales team or visit our booth.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay d-none" id="loadingOverlay">
+    <div class="loading-content">
+        <div class="spinner-border text-light mb-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-light">Processing...</p>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Include SignalR -->
+    <script src="https://unpkg.com/@@microsoft/signalr@latest/dist/browser/signalr.js"></script>
+    <!-- Customer workflow JavaScript -->
+    <script src="~/js/customer-workflow.js" asp-append-version="true"></script>
+
+    <script>
+        // Initialize customer workflow with configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof CustomerWorkflow !== 'undefined') {
+                CustomerWorkflow.init({
+                    apiBaseUrl: '@Model.ApiBaseUrl',
+                    signalRHubUrl: '@Model.SignalRHubUrl'
+                });
+            }
+        });
+    </script>
+}

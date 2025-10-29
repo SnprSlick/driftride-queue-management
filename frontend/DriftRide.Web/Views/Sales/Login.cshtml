@@ -1,0 +1,163 @@
+@model SalesLoginViewModel
+@{
+    ViewData["Title"] = "Sales Staff Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-lg mt-5">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3><i class="fas fa-user-tie me-2"></i>Sales Staff Login</h3>
+                </div>
+                <div class="card-body p-4">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            @Html.ValidationSummary(false, "", new { @class = "text-danger mb-0" })
+                        </div>
+                    }
+
+                    <form asp-action="Login" method="post" class="needs-validation" novalidate>
+                        <input type="hidden" asp-for="ReturnUrl" />
+
+                        <div class="mb-3">
+                            <label asp-for="Username" class="form-label">
+                                <i class="fas fa-user me-1"></i>Username
+                            </label>
+                            <input asp-for="Username" class="form-control form-control-lg"
+                                   placeholder="Enter your username" autocomplete="username"
+                                   autofocus required />
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Password" class="form-label">
+                                <i class="fas fa-lock me-1"></i>Password
+                            </label>
+                            <input asp-for="Password" class="form-control form-control-lg"
+                                   placeholder="Enter your password" autocomplete="current-password"
+                                   required />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Sales staff access only. Unauthorized access is prohibited.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="@Url.Action("Index", "Customer")" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Customer Portal
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+        padding: 1.5rem;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-weight: 600;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #5a6fd8, #6a419a);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 12px 16px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+    }
+</style>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        // Auto-focus on first input and handle Enter key navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.getElementById('Username');
+            const passwordInput = document.getElementById('Password');
+            const form = document.querySelector('form');
+
+            // Auto-focus username field
+            if (usernameInput && !usernameInput.value) {
+                usernameInput.focus();
+            }
+
+            // Enter key navigation
+            usernameInput?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    passwordInput?.focus();
+                }
+            });
+
+            passwordInput?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    form?.submit();
+                }
+            });
+
+            // Form validation
+            form?.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        });
+    </script>
+}

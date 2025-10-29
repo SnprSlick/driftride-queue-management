@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+
+    <!-- ASP.NET Core Testing -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.11" />
+
+    <!-- Entity Framework Testing -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
+
+    <!-- JSON and HTTP Testing -->
+    <PackageReference Include="System.Net.Http.Json" Version="8.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+
+    <!-- Authentication Testing -->
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.1.0" />
+
+    <!-- Password Hashing -->
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../DriftRide.Api/DriftRide.Api.csproj" />
+  </ItemGroup>
+
+  <!-- Include source files from backend/src for testing -->
+  <ItemGroup>
+    <!-- Models -->
+    <Compile Include="../../src/models/*.cs" />
+
+    <!-- Data layer -->
+    <Compile Include="../../src/data/*.cs" />
+    <Compile Include="../../src/data/Configurations/*.cs" />
+    <Compile Include="../../src/data/SeedData/*.cs" />
+
+    <!-- Services -->
+    <Compile Include="../../src/services/*.cs" />
+
+    <!-- API Controllers and Middleware -->
+    <Compile Include="../../src/api/**/*.cs" />
+
+    <!-- SignalR Hubs -->
+    <Compile Include="../../src/hubs/*.cs" />
+  </ItemGroup>
+
+</Project>
