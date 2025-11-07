@@ -341,11 +341,11 @@
         }
 
         .toggle-switch.hot .toggle-slider::before {
-            content: "🔥";
+            content: "HOT";
         }
 
         .toggle-switch.cold .toggle-slider::before {
-            content: "❄️";
+            content: "COLD";
         }
 
         .track-mode-text {
@@ -363,38 +363,95 @@
             color: #2563eb;
         }
 
-        /* Minimized Pending Payments Section */
-        .data-table.minimized {
-            margin-bottom: 8px;
-        }
-
-        .data-table.minimized .table-header {
-            padding: 4px 8px;
-            cursor: pointer;
+        /* Pending Payments Section - Dynamic Visibility */
+        #pendingPaymentsSection {
             transition: all 0.3s ease;
         }
 
-        .data-table.minimized .table-header:hover {
+        #pendingPaymentsSection .table-header {
+            cursor: pointer;
+        }
+
+        #pendingPaymentsSection .table-header:hover {
             background: linear-gradient(135deg, #505050, #454545);
         }
 
-        .data-table.minimized .table-header h2 {
+        /* When payments exist - make header more prominent */
+        #pendingPaymentsSection.has-payments .table-header h2 {
+            color: #00d4ff;
+        }
+
+        #pendingPaymentsSection.has-payments .table-badge {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* Queue Position Change Animations */
+        .position-changed {
+            animation: positionChange 1.5s ease-in-out;
+            background: rgba(0, 255, 136, 0.1) !important;
+            border: 1px solid rgba(0, 255, 136, 0.3) !important;
+        }
+
+        .position-changed .position-number {
+            color: #00ff88;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+        }
+
+        .moved-up {
+            border-left: 4px solid #00ff88 !important;
+        }
+
+        .moved-down {
+            border-left: 4px solid #ff8800 !important;
+        }
+
+        .position-indicator {
+            display: inline-block;
+            margin-left: 8px;
+            color: #00ff88;
+            animation: bounce 1s infinite;
             font-size: 0.9rem;
-            color: #b0b0b0;
         }
 
-        .data-table.minimized .table-badge {
-            font-size: 0.65rem;
-            background: rgba(0, 212, 255, 0.1);
-            color: #6b7280;
+        .moved-down .position-indicator::before {
+            content: "↘️";
+            color: #ff8800;
         }
 
-        .data-table.minimized .table-content {
-            display: none;
+        @keyframes positionChange {
+            0% {
+                background: rgba(0, 255, 136, 0.3);
+                transform: scale(1.02);
+            }
+            50% {
+                background: rgba(0, 255, 136, 0.2);
+                transform: scale(1.01);
+            }
+            100% {
+                background: rgba(0, 255, 136, 0.1);
+                transform: scale(1);
+            }
         }
 
-        .data-table.expanded .table-content {
-            display: block;
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-3px);
+            }
+            60% {
+                transform: translateY(-2px);
+            }
         }
 
         /* Completed rides styles */
@@ -448,16 +505,19 @@
             display: flex;
             gap: 15px;
             font-size: 0.9rem;
-            color: #6b7280;
+            color: #b0b0b0;
             margin-bottom: 10px;
         }
 
         .completed-details {
-            background: #f8fafc;
+            background: #1a1a1a;
+            border: 1px solid #404040;
             padding: 10px;
-            border-radius: 8px;
+            border-radius: 2px;
             font-size: 0.9rem;
             margin-bottom: 10px;
+            color: #e0e0e0;
+            clip-path: polygon(6px 0%, 100% 0%, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0% 100%, 0% 6px);
         }
 
         .restore-btn {
@@ -633,14 +693,14 @@
         .customer-details h3 {
             margin: 0 0 5px 0;
             font-size: 1.1rem;
-            color: #2d3748;
+            color: #ffffff;
         }
 
         .customer-meta {
             display: flex;
             gap: 15px;
             font-size: 0.9rem;
-            color: #6b7280;
+            color: #b0b0b0;
         }
 
         .customer-actions {
@@ -680,23 +740,31 @@
         }
 
         .pending-item {
-            background: #fff5f5;
-            border: 2px solid #fed7d7;
-            border-radius: 10px;
+            background: #2a1a1a;
+            border: 2px solid #404040;
+            border-radius: 3px;
             padding: 15px;
             margin-bottom: 15px;
             animation: fadeIn 0.3s ease;
+            clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
         }
 
         .pending-item.urgent {
-            border-color: #e53e3e;
-            background: #fef5e7;
+            border-color: #ff4757;
+            background: #3a1a1a;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.3);
             animation: urgentPulse 1s infinite alternate;
         }
 
         @keyframes urgentPulse {
-            from { background: #fef5e7; }
-            to { background: #fed7d7; }
+            from {
+                background: #3a1a1a;
+                box-shadow: 0 0 15px rgba(255, 71, 87, 0.3);
+            }
+            to {
+                background: #4a2a2a;
+                box-shadow: 0 0 25px rgba(255, 71, 87, 0.5);
+            }
         }
 
         @keyframes fadeIn {
@@ -719,39 +787,72 @@
             background: #38a169;
         }
 
-        .statistics {
+        /* Compact Statistics Table */
+        .stats-table {
+            margin-top: 15px;
+        }
+
+        .stats-table-content {
+            padding: 10px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .stats-table.collapsed .stats-table-content {
+            max-height: 0;
+            padding: 0 10px;
+            opacity: 0;
+        }
+
+        .stats-table .table-header {
+            cursor: pointer;
+        }
+
+        .stats-table .table-header:hover {
+            background: linear-gradient(135deg, #454545, #3a3a3a);
+        }
+
+        .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
         }
 
-        .stat-card {
-            background: #1a1a1a;
-            border: 2px solid #404040;
-            padding: 20px;
-            border-radius: 2px;
-            clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.1), inset 0 0 30px rgba(0, 212, 255, 0.02);
+        .stats-cell {
             text-align: center;
-            position: relative;
+            padding: 8px 6px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 2px;
+            clip-path: polygon(6px 0%, 100% 0%, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0% 100%, 0% 6px);
         }
 
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #00d4ff;
-            margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
-            font-family: 'Courier New', monospace;
-        }
-
-        .stat-label {
-            color: #e0e0e0;
-            font-size: 0.9rem;
+        .stats-label {
+            font-size: 0.7rem;
+            color: #b0b0b0;
             text-transform: uppercase;
             font-weight: 600;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .stats-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00d4ff;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Track mode badge in stats header */
+        #trackModeBadge {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+        }
+
+        #trackModeBadge.cold {
+            background: rgba(37, 99, 235, 0.2);
+            color: #2563eb;
         }
 
         .drag-instruction {
@@ -864,8 +965,9 @@
         .customer-name-display {
             font-size: 2rem;
             font-weight: bold;
-            color: #1f2937;
+            color: #ffffff;
             margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
         }
 
         .customer-actions {
@@ -910,17 +1012,20 @@
         }
 
         .wait-time {
-            background: #fee2e2;
-            color: #dc2626;
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.4);
             padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 2px;
             font-weight: 600;
             font-size: 0.9rem;
+            clip-path: polygon(4px 0%, 100% 0%, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0% 100%, 0% 4px);
         }
 
         .wait-time.long {
-            background: #fecaca;
-            color: #991b1b;
+            background: rgba(255, 71, 87, 0.3);
+            color: #ff1744;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.4);
         }
 
         /* Modal Styles */
@@ -1071,17 +1176,21 @@
             width: 100%;
             min-height: 80px;
             padding: 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
+            border: 2px solid #404040;
+            border-radius: 2px;
             font-family: inherit;
             font-size: 0.95rem;
             resize: vertical;
             transition: border-color 0.2s;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            clip-path: polygon(6px 0%, 100% 0%, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0% 100%, 0% 6px);
         }
 
         .modal-notes textarea:focus {
             outline: none;
-            border-color: #3b82f6;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
         }
 
         .modal-actions {
@@ -1101,27 +1210,37 @@
         }
 
         .modal-btn-primary {
-            background: #3b82f6;
-            color: white;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #1a1a1a;
+            border: 1px solid #00d4ff;
+            clip-path: polygon(4px 0%, 100% 0%, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0% 100%, 0% 4px);
         }
 
         .modal-btn-primary:hover {
-            background: #2563eb;
+            background: linear-gradient(135deg, #0099cc, #007acc);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+            transform: translateY(-1px);
         }
 
         .modal-btn-primary:disabled {
-            background: #9ca3af;
+            background: #404040;
+            color: #6b7280;
             cursor: not-allowed;
+            border: 1px solid #404040;
+            box-shadow: none;
         }
 
         .modal-btn-secondary {
-            background: #f3f4f6;
-            color: #374151;
-            border: 1px solid #d1d5db;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #404040;
+            clip-path: polygon(4px 0%, 100% 0%, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0% 100%, 0% 4px);
         }
 
         .modal-btn-secondary:hover {
-            background: #e5e7eb;
+            background: #353535;
+            border-color: #606060;
+            transform: translateY(-1px);
         }
 
         .empty-state {
@@ -1305,24 +1424,23 @@
                 gap: 2px;
             }
 
-            /* Compact statistics */
-            .statistics {
+            /* Compact statistics table */
+            .stats-row {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 6px;
-                margin-top: 10px;
+                gap: 4px;
             }
 
-            .stat-card {
-                padding: 8px 6px;
+            .stats-cell {
+                padding: 6px 4px;
             }
 
-            .stat-value {
-                font-size: 1.2rem;
+            .stats-value {
+                font-size: 1.1rem;
+            }
+
+            .stats-label {
+                font-size: 0.65rem;
                 margin-bottom: 2px;
-            }
-
-            .stat-label {
-                font-size: 0.7rem;
             }
 
             /* Compact empty states */
@@ -1345,7 +1463,7 @@
 
             /* Stack customer info vertically */
             .table-cell:nth-child(1)::after {
-                content: " • " attr(data-phone) " • " attr(data-amount) " • " attr(data-time);
+                content: " • " attr(data-time);
                 display: block;
                 font-size: 0.65rem;
                 color: #b0b0b0;
@@ -1353,9 +1471,7 @@
             }
 
             /* Hide individual data cells on mobile, show mobile details instead */
-            .table-cell:nth-child(2),
-            .table-cell:nth-child(3),
-            .table-cell:nth-child(4) {
+            .table-cell:nth-child(2) {
                 display: none;
             }
 
@@ -1395,9 +1511,9 @@
                 gap: 10px;
             }
 
-            .statistics {
+            .stats-row {
                 grid-template-columns: repeat(4, 1fr);
-                gap: 10px;
+                gap: 6px;
             }
 
             .table-row {
@@ -1413,9 +1529,9 @@
         }
 
         @media (min-width: 769px) {
-            .statistics {
+            .stats-row {
                 grid-template-columns: repeat(4, 1fr);
-                gap: 15px;
+                gap: 8px;
             }
 
             .table-row {
@@ -1460,21 +1576,7 @@
             </div>
         </div>
         <div class="main-layout">
-            <!-- 1. Pending Payments Table (TOP - Immediate Approval) -->
-            <div class="data-table minimized" id="pendingPaymentsSection">
-                <div class="table-header" onclick="salesQueue.togglePendingPayments()">
-                    <h2>💳 Pending Payments</h2>
-                    <span class="table-badge" id="pendingBadge">0 pending</span>
-                </div>
-                <div class="table-content" id="pendingPaymentsTable">
-                    <div class="empty-state-compact">
-                        <div class="icon">✅</div>
-                        <p>No pending payments</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. Current Customer (Single Line) -->
+            <!-- 1. Current Customer (TOP - Primary Focus) -->
             <div id="currentCustomerLine" class="current-customer-line" style="display: none;">
                 <div class="customer-info-line" id="currentCustomerInfo">
                     <!-- Current customer info will be populated here -->
@@ -1495,10 +1597,10 @@
                 <p>No current customer - Next customer will appear here</p>
             </div>
 
-            <!-- 3. Active Queue Table -->
+            <!-- 2. Active Queue Table (Second Priority) -->
             <div class="data-table">
                 <div class="table-header">
-                    <h2>⏳ Active Queue</h2>
+                    <h2>Active Queue</h2>
                     <span class="table-badge" id="queueBadge">0 waiting</span>
                 </div>
                 <div class="table-content" id="activeQueueTable">
@@ -1509,23 +1611,45 @@
                 </div>
             </div>
 
-            <!-- 4. Statistics Dashboard (BOTTOM) -->
-            <div class="statistics">
-                <div class="stat-card">
-                    <div class="stat-value" id="queueCount">0</div>
-                    <div class="stat-label">In Queue</div>
+            <!-- 3. Pending Payments Table (Hidden by Default - Only Visible When Payments Exist) -->
+            <div class="data-table" id="pendingPaymentsSection" style="display: none;">
+                <div class="table-header" onclick="salesQueue.togglePendingPayments()">
+                    <h2>Pending Payments</h2>
+                    <span class="table-badge" id="pendingBadge">0 pending</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="pendingCount">0</div>
-                    <div class="stat-label">Pending Payments</div>
+                <div class="table-content" id="pendingPaymentsTable">
+                    <div class="empty-state-compact">
+                        <div class="icon">✅</div>
+                        <p>No pending payments</p>
+                    </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="completedToday">0</div>
-                    <div class="stat-label">Completed Today</div>
+            </div>
+
+            <!-- 4. Statistics Dashboard Table (BOTTOM) -->
+            <div class="data-table stats-table collapsed">
+                <div class="table-header" onclick="salesQueue.toggleStatistics()">
+                    <h2>Dashboard Statistics</h2>
+                    <span class="table-badge" id="trackModeBadge">Hot Track</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="revenueToday">$0</div>
-                    <div class="stat-label">Today's Revenue</div>
+                <div class="stats-table-content">
+                    <div class="stats-row">
+                        <div class="stats-cell">
+                            <div class="stats-label">In Queue</div>
+                            <div class="stats-value" id="queueCount">0</div>
+                        </div>
+                        <div class="stats-cell">
+                            <div class="stats-label">Pending Payments</div>
+                            <div class="stats-value" id="pendingCount">0</div>
+                        </div>
+                        <div class="stats-cell">
+                            <div class="stats-label">Completed Today</div>
+                            <div class="stats-value" id="completedToday">0</div>
+                        </div>
+                        <div class="stats-cell">
+                            <div class="stats-label">Today's Revenue</div>
+                            <div class="stats-value" id="revenueToday">$0</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1535,7 +1659,7 @@
     <div class="modal-overlay" id="completeRideModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>✅ Complete Ride</h3>
+                <h3>Complete Ride</h3>
                 <div class="modal-customer" id="completeModalCustomer">
                     <!-- Customer info will be inserted here -->
                 </div>
@@ -1545,11 +1669,11 @@
                 <h4>How would you like to complete this ride?</h4>
                 <div class="modal-options">
                     <div class="modal-option" data-action="complete" onclick="salesQueue.selectCompleteAction('complete')">
-                        <div class="modal-option-title">✅ Mark as Completed</div>
+                        <div class="modal-option-title">Mark as Completed</div>
                         <div class="modal-option-desc">Ride completed successfully</div>
                     </div>
                     <div class="modal-option" data-action="return" onclick="salesQueue.selectCompleteAction('return')">
-                        <div class="modal-option-title">↩️ Return to Queue</div>
+                        <div class="modal-option-title">Return to Queue</div>
                         <div class="modal-option-desc">Customer returns to end of queue</div>
                     </div>
                 </div>
@@ -1588,7 +1712,7 @@
                 <h4>Why is this customer being returned to the queue?</h4>
                 <div class="modal-options">
                     <div class="modal-option" data-reason="not_ready" onclick="salesQueue.selectReturnReason('not_ready')">
-                        <div class="modal-option-title">⏳ Customer Not Ready</div>
+                        <div class="modal-option-title">Customer Not Ready</div>
                         <div class="modal-option-desc">Customer needs more time</div>
                     </div>
                     <div class="modal-option" data-reason="equipment_issue" onclick="salesQueue.selectReturnReason('equipment_issue')">
@@ -1600,7 +1724,7 @@
                         <div class="modal-option-desc">Customer asked to wait</div>
                     </div>
                     <div class="modal-option" data-reason="other" onclick="salesQueue.selectReturnReason('other')">
-                        <div class="modal-option-title">📝 Other Reason</div>
+                        <div class="modal-option-title">Other Reason</div>
                         <div class="modal-option-desc">Specify in notes</div>
                     </div>
                 </div>
@@ -1636,7 +1760,7 @@
                 <h4>What should happen to the current rider?</h4>
                 <div class="modal-options">
                     <div class="modal-option" data-action="complete" onclick="salesQueue.selectReplacementAction('complete')">
-                        <div class="modal-option-title">✅ Mark as Completed</div>
+                        <div class="modal-option-title">Mark as Completed</div>
                         <div class="modal-option-desc">Current ride finished successfully</div>
                     </div>
                     <div class="modal-option" data-action="return" onclick="salesQueue.selectReplacementAction('return')">
@@ -1790,7 +1914,7 @@
                         await this.loadCurrentCustomer();
                         await this.loadQueue();
 
-                        const modeText = mode === 'hot' ? '🔥 Hot Track (Auto-progression)' : '❄️ Cold Track (Manual)';
+                        const modeText = mode === 'hot' ? 'Hot Track (Auto-progression)' : 'Cold Track (Manual)';
                         this.showNotification(`Track mode set to ${modeText}`, 'success');
 
                         // Broadcast event for driver dashboard sync
@@ -1812,15 +1936,24 @@
                 // Update the floating toggle switch
                 const toggle = document.getElementById('trackToggle');
                 const text = document.getElementById('trackModeText');
+                const trackBadge = document.getElementById('trackModeBadge');
 
                 if (this.trackMode === 'hot') {
                     toggle.className = 'toggle-switch hot';
                     text.className = 'track-mode-text hot';
                     text.textContent = 'Hot Track';
+                    if (trackBadge) {
+                        trackBadge.textContent = 'Hot Track';
+                        trackBadge.className = 'table-badge';
+                    }
                 } else {
                     toggle.className = 'toggle-switch cold';
                     text.className = 'track-mode-text cold';
                     text.textContent = 'Cold Track';
+                    if (trackBadge) {
+                        trackBadge.textContent = 'Cold Track';
+                        trackBadge.className = 'table-badge cold';
+                    }
                 }
 
                 // Update statistics which now includes track mode information
@@ -1834,12 +1967,28 @@
 
             togglePendingPayments() {
                 const section = document.getElementById('pendingPaymentsSection');
-                if (section.classList.contains('minimized')) {
-                    section.classList.remove('minimized');
-                    section.classList.add('expanded');
+                const content = document.getElementById('pendingPaymentsTable');
+
+                // Only allow toggling if payments exist (section is visible)
+                if (section.style.display === 'none' || !section.classList.contains('has-payments')) {
+                    return;
+                }
+
+                // Toggle content visibility within the visible section
+                if (content.style.display === 'none') {
+                    content.style.display = 'block';
                 } else {
-                    section.classList.add('minimized');
-                    section.classList.remove('expanded');
+                    content.style.display = 'none';
+                }
+            }
+
+            toggleStatistics() {
+                const statsTable = document.querySelector('.stats-table');
+
+                if (statsTable.classList.contains('collapsed')) {
+                    statsTable.classList.remove('collapsed');
+                } else {
+                    statsTable.classList.add('collapsed');
                 }
             }
 
@@ -1888,7 +2037,7 @@
                         <div class="customer-info-value">${customer.name}</div>
                     </div>
                     <div class="customer-info-item">
-                        <div class="customer-info-label">📱 Phone</div>
+                        <div class="customer-info-label">Phone</div>
                         <div class="customer-info-value">${customer.phoneNumber}</div>
                     </div>
                     <div class="customer-info-item">
@@ -1911,7 +2060,7 @@
 
             renderQueue() {
                 const queueTable = document.getElementById('activeQueueTable');
-                const waitingQueue = this.queue
+                let waitingQueue = this.queue
                     .filter(item => item.status === 'Waiting')
                     .sort((a, b) => a.position - b.position);
 
@@ -1925,33 +2074,56 @@
                     return;
                 }
 
-                queueTable.innerHTML = waitingQueue.map((item, index) => `
-                    <div class="table-row"
-                         data-queue-id="${item.id}"
-                         data-position="${item.position}">
-                        <div class="table-cell name"
-                             data-phone="${item.customer.phoneNumber}"
-                             data-amount="$${item.payment.amount}"
-                             data-time="${this.formatTime(item.queuedAt)}">
-                            ${item.position}. ${item.customer.name}
-                            <div class="mobile-details">📱 ${item.customer.phoneNumber} • 💰 $${item.payment.amount} • ⏰ ${this.formatTime(item.queuedAt)}</div>
+                // Validate positions before rendering
+                if (!this.validateQueuePositions()) {
+                    console.log('Position validation failed, recalculating...');
+                    waitingQueue = this.recalculatePositions();
+                }
+
+                // Normalize positions for display
+                const normalizedQueue = this.normalizeDisplayPositions(waitingQueue);
+
+                queueTable.innerHTML = normalizedQueue.map((item, index) => {
+                    const displayPosition = item.displayPosition;
+                    const positionChangeClass = item.positionChanged ? 'position-changed' : '';
+                    const moveDirection = item.positionChanged && item.previousPosition > item.position ? 'moved-up' :
+                                         item.positionChanged && item.previousPosition < item.position ? 'moved-down' : '';
+
+                    return `
+                        <div class="table-row ${positionChangeClass} ${moveDirection}"
+                             data-queue-id="${item.id}"
+                             data-position="${item.originalPosition}"
+                             data-display-position="${displayPosition}">
+                            <div class="table-cell name"
+                                 data-time="${this.formatTime(item.queuedAt)}">
+                                <span class="position-number">${displayPosition}.</span>
+                                <span class="customer-name">${item.customer.name}</span>
+                                ${item.positionChanged ? `<span class="position-indicator">↗️</span>` : ''}
+                                <div class="mobile-details">Queued: ${this.formatTime(item.queuedAt)}</div>
+                            </div>
+                            <div class="table-cell">Queued: ${this.formatTime(item.queuedAt)}</div>
+                            <div class="table-actions">
+                                <button class="btn-compact btn-start" onclick="salesQueue.startRide(${item.id})">
+                                    Start
+                                </button>
+                                <button class="btn-compact btn-priority" onclick="salesQueue.prioritizeCustomer(${item.id})">
+                                    ↑
+                                </button>
+                                <button class="btn-compact btn-remove" onclick="salesQueue.removeCustomer(${item.id})">
+                                    Remove
+                                </button>
+                            </div>
                         </div>
-                        <div class="table-cell">📱 ${item.customer.phoneNumber}</div>
-                        <div class="table-cell">💰 $${item.payment.amount}</div>
-                        <div class="table-cell">⏰ ${this.formatTime(item.queuedAt)}</div>
-                        <div class="table-actions">
-                            <button class="btn-compact btn-start" onclick="salesQueue.startRide(${item.id})">
-                                🚗 Start
-                            </button>
-                            <button class="btn-compact btn-priority" onclick="salesQueue.prioritizeCustomer(${item.id})">
-                                ⬆️
-                            </button>
-                            <button class="btn-compact btn-remove" onclick="salesQueue.removeCustomer(${item.id})">
-                                ❌
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
+
+                // Clear position change flags after rendering
+                setTimeout(() => {
+                    waitingQueue.forEach(item => {
+                        delete item.positionChanged;
+                        delete item.previousPosition;
+                    });
+                }, 2000); // Clear after animation completes
             }
 
             renderPendingPayments() {
@@ -1959,20 +2131,14 @@
                 const pendingSection = document.getElementById('pendingPaymentsSection');
 
                 if (this.pendingPayments.length === 0) {
-                    // Keep minimized when empty
-                    pendingSection.classList.add('minimized');
-                    pendingSection.classList.remove('expanded');
-                    pendingTable.innerHTML = `
-                        <div class="empty-state-compact">
-                            <div class="icon">✅</div>
-                            <p>No pending payments</p>
-                        </div>
-                    `;
+                    // Hide completely when empty
+                    pendingSection.style.display = 'none';
+                    pendingSection.classList.remove('has-payments');
                     return;
                 } else {
-                    // Expand when there are payments
-                    pendingSection.classList.remove('minimized');
-                    pendingSection.classList.add('expanded');
+                    // Show and style when payments exist
+                    pendingSection.style.display = 'block';
+                    pendingSection.classList.add('has-payments');
                 }
 
                 // Sort by urgency - most urgent first
@@ -2034,6 +2200,19 @@
                         newOrder.push(draggedId);
                     }
 
+                    // Update local positions immediately for visual feedback
+                    waitingQueue.forEach((item, index) => {
+                        const newPosition = newOrder.indexOf(item.id) + 1;
+                        if (newPosition !== item.position && newPosition > 0) {
+                            item.positionChanged = true;
+                            item.previousPosition = item.position;
+                            item.position = newPosition;
+                        }
+                    });
+
+                    // Recalculate positions to ensure consistency
+                    this.recalculatePositions();
+
                     const response = await fetch(`${API_BASE}/queue/reorder`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -2041,19 +2220,38 @@
                     });
 
                     if (response.ok) {
-                        await this.loadQueue();
+                        // Re-render with animations
+                        this.renderQueue();
+
                         this.broadcastQueueUpdate('queue_reordered', { newOrder });
                         this.showNotification('Queue reordered successfully', 'success');
+                    } else {
+                        // Reload from server if update failed
+                        await this.loadQueue();
                     }
                 } catch (error) {
                     console.error('Error reordering queue:', error);
                     this.showNotification('Failed to reorder queue', 'error');
+                    await this.loadQueue(); // Reload on error
                 }
             }
 
             async prioritizeCustomer(queueId) {
                 try {
                     const waitingQueue = this.queue.filter(q => q.status === 'Waiting');
+                    const prioritizedCustomer = waitingQueue.find(q => q.id === queueId);
+
+                    if (!prioritizedCustomer) return;
+
+                    // Update local queue for immediate feedback
+                    prioritizedCustomer.position = 1;
+                    waitingQueue.filter(q => q.id !== queueId).forEach((item, index) => {
+                        item.position = index + 2; // Start from position 2
+                    });
+
+                    // Recalculate and normalize all positions
+                    this.recalculatePositions();
+
                     const newOrder = [queueId, ...waitingQueue.filter(q => q.id !== queueId).map(q => q.id)];
 
                     const response = await fetch(`${API_BASE}/queue/reorder`, {
@@ -2063,13 +2261,19 @@
                     });
 
                     if (response.ok) {
-                        await this.loadQueue();
+                        // Re-render with animations
+                        this.renderQueue();
+
                         this.broadcastQueueUpdate('customer_prioritized', { queueId, newOrder });
-                        this.showNotification('Customer moved to front of queue', 'success');
+                        this.showNotification(`${prioritizedCustomer.customer.name} moved to front of queue`, 'success');
+                    } else {
+                        // Reload from server if update failed
+                        await this.loadQueue();
                     }
                 } catch (error) {
                     console.error('Error prioritizing customer:', error);
                     this.showNotification('Failed to prioritize customer', 'error');
+                    await this.loadQueue(); // Reload on error
                 }
             }
 
@@ -2125,6 +2329,10 @@
                         // In a real system, there would be a DELETE endpoint
                         const newQueue = this.queue.filter(q => q.id !== queueId);
                         this.queue = newQueue;
+
+                        // Recalculate positions after removal to eliminate gaps
+                        this.recalculatePositions();
+
                         this.renderQueue();
                         this.showNotification(`${customer.customer.name} removed from queue`, 'warning');
                     } catch (error) {
@@ -2132,6 +2340,67 @@
                         this.showNotification('Failed to remove customer', 'error');
                     }
                 }
+            }
+
+            // Position Management Functions
+            recalculatePositions() {
+                const waitingQueue = this.queue.filter(q => q.status === 'Waiting');
+
+                // Sort by current position to maintain relative order
+                waitingQueue.sort((a, b) => a.position - b.position);
+
+                // Assign sequential positions starting from 1
+                waitingQueue.forEach((item, index) => {
+                    const newPosition = index + 1;
+                    const oldPosition = item.position;
+
+                    if (oldPosition !== newPosition) {
+                        // Track position changes for animation
+                        item.positionChanged = true;
+                        item.previousPosition = oldPosition;
+                    }
+
+                    item.position = newPosition;
+                });
+
+                // Log position recalculation for debugging
+                console.log('Queue positions recalculated:', waitingQueue.map(q => `${q.customer.name}: ${q.previousPosition || 'new'} → ${q.position}`));
+
+                return waitingQueue;
+            }
+
+            validateQueuePositions() {
+                const waitingQueue = this.queue.filter(q => q.status === 'Waiting');
+                const positions = waitingQueue.map(q => q.position).sort((a, b) => a - b);
+
+                // Check for gaps or duplicates
+                const issues = [];
+                for (let i = 0; i < positions.length; i++) {
+                    const expectedPosition = i + 1;
+                    if (positions[i] !== expectedPosition) {
+                        issues.push(`Expected position ${expectedPosition}, found ${positions[i]}`);
+                    }
+                }
+
+                if (issues.length > 0) {
+                    console.warn('Queue position validation issues:', issues);
+                    return false;
+                }
+
+                return true;
+            }
+
+            normalizeDisplayPositions(queueItems) {
+                // For display purposes, always show positions as 1, 2, 3, 4...
+                // regardless of what the server positions actually are
+                const waitingItems = queueItems.filter(item => item.status === 'Waiting');
+                waitingItems.sort((a, b) => a.position - b.position);
+
+                return waitingItems.map((item, index) => ({
+                    ...item,
+                    displayPosition: index + 1,
+                    originalPosition: item.position
+                }));
             }
 
             async confirmPayment(paymentId, confirmed) {
@@ -2360,7 +2629,7 @@
                 } else if (action === 'return') {
                     reasonOptions.innerHTML = `
                         <div class="modal-option" data-reason="not_ready" onclick="salesQueue.selectCompleteReason('not_ready')">
-                            <div class="modal-option-title">⏳ Customer Not Ready</div>
+                            <div class="modal-option-title">Customer Not Ready</div>
                             <div class="modal-option-desc">Customer needs more time</div>
                         </div>
                         <div class="modal-option" data-reason="equipment_issue" onclick="salesQueue.selectCompleteReason('equipment_issue')">
