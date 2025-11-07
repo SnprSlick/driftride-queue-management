@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriftRide - Navigation Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .status-panel {
+            background: rgba(42, 42, 42, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid #404040;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            text-align: center;
+            color: white;
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .status-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.offline {
+            background: #ff4444;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .dashboard-card {
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 212, 255, 0.2);
+            border-color: #00d4ff;
+        }
+
+        .card-header {
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .card-header.sales {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .card-header.driver {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .card-header.customer {
+            background: linear-gradient(135deg, #ffaa00, #ff8800);
+            color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
+        }
+
+        .card-header.config {
+            background: linear-gradient(135deg, #aa55ff, #8833dd);
+            color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(170, 85, 255, 0.3);
+        }
+
+        .card-header.demo {
+            background: linear-gradient(135deg, #5577ff, #4455dd);
+            color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(85, 119, 255, 0.3);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .card-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-functional {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .status-demo {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-description {
+            color: #b0b0b0;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .card-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #404040;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-features li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: #1a1a1a;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #00e6ff, #00b3db);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: #3a3a3a;
+            color: #e0e0e0;
+            border: 1px solid #505050;
+        }
+
+        .btn-secondary:hover {
+            background: #4a4a4a;
+            border-color: #606060;
+        }
+
+        .credentials-panel {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #00d4ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .credentials-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .credentials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .credential-item {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .credential-role {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .credential-value {
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏎️ DriftRide</h1>
+            <p>Queue Management System - Testing Hub</p>
+        </div>
+
+        <!-- System Status Panel -->
+        <div class="status-panel">
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-value" id="queueCount">-</div>
+                    <div class="status-label">Active Queue</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="pendingCount">-</div>
+                    <div class="status-label">Pending Payments</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="completedCount">-</div>
+                    <div class="status-label">Completed Rides</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value" id="currentCustomer">-</div>
+                    <div class="status-label">Current Customer</div>
+                </div>
+            </div>
+            <div class="api-status">
+                <div class="status-indicator" id="apiIndicator"></div>
+                <span id="apiStatus">Checking API Status...</span>
+            </div>
+
+            <!-- Demo Credentials -->
+            <div class="credentials-panel">
+                <div class="credentials-title">🎮 Demo Credentials</div>
+                <div class="credentials-grid">
+                    <div class="credential-item">
+                        <div class="credential-role">Sales Staff</div>
+                        <div class="credential-value">sales@example.com / password</div>
+                    </div>
+                    <div class="credential-item">
+                        <div class="credential-role">Driver</div>
+                        <div class="credential-value">driver@example.com / password</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Navigation Grid -->
+        <div class="dashboard-grid">
+            <!-- Sales Queue Dashboard -->
+            <div class="dashboard-card">
+                <div class="card-header sales">
+                    <div class="card-status status-functional">Functional</div>
+                    <div class="card-icon">🚗</div>
+                    <div class="card-title">Sales Queue Dashboard</div>
+                    <div class="card-subtitle">Main Sales Interface</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        Comprehensive sales dashboard with tabbed interface for queue management, payment verification, and completed rides tracking.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="feature-icon">✓</span> Current customer display</li>
+                        <li><span class="feature-icon">✓</span> Active queue management</li>
+                        <li><span class="feature-icon">✓</span> Pending payments verification</li>
+                        <li><span class="feature-icon">✓</span> Completed rides with restore</li>
+                        <li><span class="feature-icon">✓</span> Real-time updates</li>
+                    </ul>
+                    <div class="card-actions">
+                        <a href="sales-queue-demo.html" class="btn btn-primary">Open Dashboard</a>
+                        <a href="sales-queue-demo.html" target="_blank" class="btn btn-secondary">New Tab</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Driver Dashboard -->
+            <div class="dashboard-card">
+                <div class="card-header driver">
+                    <div class="card-status status-functional">Functional</div>
+                    <div class="card-icon">🏁</div>
+                    <div class="card-title">Driver Dashboard</div>
+                    <div class="card-subtitle">Driver Operations Interface</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        Driver-focused interface showing current customer details, queue preview, and ride management controls.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="feature-icon">✓</span> Current customer details</li>
+                        <li><span class="feature-icon">✓</span> Queue preview</li>
+                        <li><span class="feature-icon">✓</span> Ride completion</li>
+                        <li><span class="feature-icon">✓</span> Performance statistics</li>
+                        <li><span class="feature-icon">✓</span> Real-time notifications</li>
+                    </ul>
+                    <div class="card-actions">
+                        <a href="driver-api-demo.html" class="btn btn-primary">Open Dashboard</a>
+                        <a href="driver-api-demo.html" target="_blank" class="btn btn-secondary">New Tab</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Demo -->
+            <div class="dashboard-card">
+                <div class="card-header customer">
+                    <div class="card-status status-demo">Demo</div>
+                    <div class="card-icon">👤</div>
+                    <div class="card-title">Customer Registration</div>
+                    <div class="card-subtitle">Customer Experience Demo</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        Customer-facing interface for registration, payment processing, and queue status tracking.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="feature-icon">✓</span> Customer registration</li>
+                        <li><span class="feature-icon">✓</span> Payment method selection</li>
+                        <li><span class="feature-icon">✓</span> Payment processing</li>
+                        <li><span class="feature-icon">✓</span> Queue position tracking</li>
+                        <li><span class="feature-icon">✓</span> Status notifications</li>
+                    </ul>
+                    <div class="card-actions">
+                        <a href="customer-demo.html" class="btn btn-primary">Open Demo</a>
+                        <a href="customer-demo.html" target="_blank" class="btn btn-secondary">New Tab</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Configuration -->
+            <div class="dashboard-card">
+                <div class="card-header config">
+                    <div class="card-status status-functional">Functional</div>
+                    <div class="card-icon">⚙️</div>
+                    <div class="card-title">Sales Configuration</div>
+                    <div class="card-subtitle">Payment Settings</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        Administrative interface for configuring payment methods, pricing, and system settings.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="feature-icon">✓</span> Payment method config</li>
+                        <li><span class="feature-icon">✓</span> Pricing management</li>
+                        <li><span class="feature-icon">✓</span> API integration settings</li>
+                        <li><span class="feature-icon">✓</span> System preferences</li>
+                    </ul>
+                    <div class="card-actions">
+                        <a href="sales-config-demo.html" class="btn btn-primary">Open Config</a>
+                        <a href="sales-config-demo.html" target="_blank" class="btn btn-secondary">New Tab</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Story Demo -->
+            <div class="dashboard-card">
+                <div class="card-header demo">
+                    <div class="card-status status-demo">Demo</div>
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">User Story 1 Demo</div>
+                    <div class="card-subtitle">End-to-End Workflow</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        Step-by-step demonstration of the complete customer journey from registration to queue entry.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="feature-icon">✓</span> Guided workflow</li>
+                        <li><span class="feature-icon">✓</span> Progress tracking</li>
+                        <li><span class="feature-icon">✓</span> Interactive steps</li>
+                        <li><span class="feature-icon">✓</span> Real-time feedback</li>
+                    </ul>
+                    <div class="card-actions">
+                        <a href="demo.html" class="btn btn-primary">Start Demo</a>
+                        <a href="demo.html" target="_blank" class="btn btn-secondary">New Tab</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Driver Demo -->
+            <div class="dashboard-card">
+                <div class="card-header demo">
+                    <div class="card-status status-demo">Demo</div>
+                    <div class="card-icon">🏎️</div>
+                    <div class="card-title">Driver Demo</div>
+                    <div class="card-subtitle">Driver Interface Demo</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-description">
+                        Demonstration version of the driver interface with sample data and interactions.
+                    </div>
+                    <ul class="card-features">
+                        <li><span class="feature-icon">✓</span> Sample queue data</li>
+                        <li><span class="feature-icon">✓</span> Demo interactions</li>
+                        <li><span class="feature-icon">✓</span> UI preview</li>
+                        <li><span class="feature-icon">✓</span> Feature showcase</li>
+                    </ul>
+                    <div class="card-actions">
+                        <a href="driver-demo.html" class="btn btn-primary">Open Demo</a>
+                        <a href="driver-demo.html" target="_blank" class="btn btn-secondary">New Tab</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class DriftRideNavigator {
+            constructor() {
+                this.API_BASE = 'http://localhost:3001/api';
+                this.init();
+            }
+
+            async init() {
+                await this.checkApiStatus();
+                await this.loadSystemStats();
+
+                // Refresh stats every 30 seconds
+                setInterval(() => {
+                    this.loadSystemStats();
+                }, 30000);
+            }
+
+            async checkApiStatus() {
+                const indicator = document.getElementById('apiIndicator');
+                const status = document.getElementById('apiStatus');
+
+                try {
+                    const response = await fetch(`${this.API_BASE}/stats`);
+                    if (response.ok) {
+                        indicator.classList.remove('offline');
+                        status.textContent = 'API Online - All Systems Operational';
+                    } else {
+                        throw new Error('API Error');
+                    }
+                } catch (error) {
+                    indicator.classList.add('offline');
+                    status.textContent = 'API Offline - Check Server Connection';
+                }
+            }
+
+            async loadSystemStats() {
+                try {
+                    // Load queue data
+                    const queueResponse = await fetch(`${this.API_BASE}/queue`);
+                    const queueData = await queueResponse.json();
+                    const queueCount = queueData.success ? queueData.data.length : 0;
+                    document.getElementById('queueCount').textContent = queueCount;
+
+                    // Load pending payments
+                    const paymentsResponse = await fetch(`${this.API_BASE}/payments/pending`);
+                    const paymentsData = await paymentsResponse.json();
+                    const pendingCount = paymentsData.success ? paymentsData.data.length : 0;
+                    document.getElementById('pendingCount').textContent = pendingCount;
+
+                    // Load completed rides
+                    const completedResponse = await fetch(`${this.API_BASE}/queue/completed`);
+                    const completedData = await completedResponse.json();
+                    const completedCount = completedData.success ? completedData.data.length : 0;
+                    document.getElementById('completedCount').textContent = completedCount;
+
+                    // Load current customer
+                    const currentResponse = await fetch(`${this.API_BASE}/queue/current`);
+                    let currentCustomer = 'None';
+                    if (currentResponse.status === 200) {
+                        const currentData = await currentResponse.json();
+                        if (currentData.success && currentData.data) {
+                            currentCustomer = currentData.data.customer.name;
+                        }
+                    }
+                    document.getElementById('currentCustomer').textContent = currentCustomer;
+
+                } catch (error) {
+                    console.error('Error loading system stats:', error);
+                    // Set default values on error
+                    document.getElementById('queueCount').textContent = '-';
+                    document.getElementById('pendingCount').textContent = '-';
+                    document.getElementById('completedCount').textContent = '-';
+                    document.getElementById('currentCustomer').textContent = '-';
+                }
+            }
+        }
+
+        // Initialize the navigator when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new DriftRideNavigator();
+        });
+    </script>
+</body>
+</html>

@@ -13,9 +13,9 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             min-height: 100vh;
-            color: #333;
+            color: #e0e0e0;
         }
 
         .container {
@@ -42,9 +42,10 @@
         }
 
         .step-card {
-            background: white;
+            background: #2a2a2a;
+            border: 1px solid #404040;
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             padding: 30px;
             margin-bottom: 20px;
             display: none;
@@ -69,22 +70,23 @@
             display: inline-block;
             width: 40px;
             height: 40px;
-            background: #667eea;
-            color: white;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: #1a1a1a;
             border-radius: 50%;
             line-height: 40px;
             font-weight: bold;
             margin-bottom: 10px;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
         }
 
         .step-title {
             font-size: 1.5rem;
-            color: #2d3748;
+            color: #ffffff;
             margin-bottom: 5px;
         }
 
         .step-description {
-            color: #6b7280;
+            color: #b0b0b0;
         }
 
         .form-group {
@@ -95,23 +97,26 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #374151;
+            color: #e0e0e0;
         }
 
         input[type="text"],
         input[type="tel"] {
             width: 100%;
             padding: 15px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid #404040;
             border-radius: 10px;
             font-size: 1rem;
             transition: border-color 0.2s;
+            background: #1a1a1a;
+            color: #e0e0e0;
         }
 
         input[type="text"]:focus,
         input[type="tel"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
         }
 
         .payment-methods {
@@ -121,22 +126,26 @@
         }
 
         .payment-method {
-            border: 2px solid #e5e7eb;
+            border: 2px solid #404040;
             border-radius: 10px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.2s;
             text-align: center;
+            background: #1a1a1a;
+            color: #e0e0e0;
         }
 
         .payment-method:hover {
-            border-color: #667eea;
+            border-color: #00d4ff;
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
         }
 
         .payment-method.selected {
-            border-color: #667eea;
-            background: #f0f7ff;
+            border-color: #00d4ff;
+            background: #0a2a3a;
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
         }
 
         .payment-method .icon {
@@ -150,7 +159,7 @@
         }
 
         .payment-method .price {
-            color: #667eea;
+            color: #00d4ff;
             font-weight: bold;
         }
 
@@ -169,29 +178,36 @@
         }
 
         .btn-primary {
-            background: #667eea;
-            color: white;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: #1a1a1a;
+            font-weight: 700;
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
         }
 
         .btn-primary:hover {
-            background: #5a67d8;
+            background: linear-gradient(45deg, #00e6ff, #00b3db);
             transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 212, 255, 0.4);
         }
 
         .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
+            background: #2a2a2a;
+            color: #e0e0e0;
             margin-top: 10px;
+            border: 1px solid #404040;
         }
 
         .btn-secondary:hover {
-            background: #d1d5db;
+            background: #3a3a3a;
+            border-color: #505050;
         }
 
         .btn:disabled {
-            background: #9ca3af;
+            background: #404040;
+            color: #808080;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         .loading {
@@ -207,8 +223,8 @@
         .spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #667eea;
+            border: 4px solid #404040;
+            border-top: 4px solid #00d4ff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 15px;
@@ -226,9 +242,10 @@
 
         .success-icon {
             font-size: 4rem;
-            color: #10b981;
+            color: #00ff88;
             margin-bottom: 20px;
             animation: bounce 0.6s ease;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
         }
 
         @keyframes bounce {
@@ -238,19 +255,21 @@
         }
 
         .queue-info {
-            background: #f0f7ff;
-            border: 2px solid #bfdbfe;
+            background: #1a2a3a;
+            border: 2px solid #00d4ff;
             border-radius: 10px;
             padding: 20px;
             text-align: center;
             margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
         }
 
         .position {
             font-size: 3rem;
             font-weight: bold;
-            color: #667eea;
+            color: #00d4ff;
             margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
         }
 
         .notification {
@@ -272,15 +291,15 @@
         }
 
         .notification.success {
-            background: #10b981;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
         }
 
         .notification.error {
-            background: #ef4444;
+            background: linear-gradient(45deg, #ff4444, #cc3333);
         }
 
         .notification.info {
-            background: #3b82f6;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
         }
 
         @media (max-width: 768px) {
@@ -375,15 +394,15 @@
 
             <div class="success-animation">
                 <div class="success-icon">🎉</div>
-                <h3>Payment Confirmed!</h3>
-                <p>You've successfully joined the drift queue</p>
+                <h3 style="color: #00ff88;">Payment Confirmed!</h3>
+                <p style="color: #e0e0e0;">You've successfully joined the drift queue</p>
             </div>
 
             <div class="queue-info" id="queueInfo">
                 <div class="position" id="queuePosition">-</div>
-                <h4>Your Position in Queue</h4>
-                <p id="estimatedWait">Calculating wait time...</p>
-                <p><small>We'll keep you updated on your position</small></p>
+                <h4 style="color: #ffffff;">Your Position in Queue</h4>
+                <p id="estimatedWait" style="color: #e0e0e0;">Calculating wait time...</p>
+                <p style="color: #b0b0b0;"><small>We'll keep you updated on your position</small></p>
             </div>
 
             <button class="btn btn-primary" onclick="refreshQueue()">Refresh Position</button>
@@ -392,6 +411,7 @@
 
     <script>
         const API_BASE = 'http://localhost:3001/api';
+        const eventChannel = 'driftride_queue_updates';
         let currentCustomer = null;
         let selectedPaymentMethod = null;
         let currentPayment = null;
@@ -400,6 +420,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadPaymentMethods();
             setupEventListeners();
+            setupEventBroadcasting();
             showNotification('Welcome to DriftRide! Ready to drift?', 'info');
         });
 
@@ -505,7 +526,7 @@
             const price = selectedPaymentMethod.price;
 
             let content = `
-                <div style="text-align: center; margin-bottom: 20px;">
+                <div style="text-align: center; margin-bottom: 20px; color: #e0e0e0;">
                     <h4>Payment Amount: $${price.toFixed(2)}</h4>
                     <p>Payment Method: ${method}</p>
                 </div>
@@ -513,7 +534,7 @@
 
             if (method === 'CashApp' || method === 'PayPal') {
                 content += `
-                    <div style="background: #f0f7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="background: #1a2a3a; border: 1px solid #00d4ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; color: #e0e0e0;">
                         <h5>Payment Instructions:</h5>
                         <ol>
                             <li>Click the "Open ${method}" button below</li>
@@ -525,7 +546,7 @@
                 `;
             } else if (method === 'CashInHand' || method === 'Cash') {
                 content += `
-                    <div style="background: #f0f7ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <div style="background: #1a2a3a; border: 1px solid #00d4ff; padding: 20px; border-radius: 10px; margin-bottom: 20px; color: #e0e0e0;">
                         <h5>Cash Payment Instructions:</h5>
                         <p>Please have $${price.toFixed(2)} ready to pay our staff member before your ride.</p>
                         <p>Click "Payment Complete" to join the queue.</p>
@@ -676,6 +697,50 @@
                 }
             }
             throw new Error('Failed to get queue position');
+        }
+
+        function setupEventBroadcasting() {
+            // Listen for storage events from other windows/tabs
+            window.addEventListener('storage', (event) => {
+                if (event.key === eventChannel && event.newValue) {
+                    const eventData = JSON.parse(event.newValue);
+                    handleBroadcastEvent(eventData);
+                }
+            });
+        }
+
+        function handleBroadcastEvent(eventData) {
+            console.log('Customer received broadcast event:', eventData);
+
+            // Handle different event types from sales dashboard
+            switch (eventData.type) {
+                case 'queue_reordered':
+                case 'customer_prioritized':
+                    // Update queue position if customer is in queue
+                    if (currentCustomer) {
+                        updateQueuePosition();
+                        showNotification('Queue updated! Your position may have changed.', 'info');
+                    }
+                    break;
+
+                case 'current_customer_changed':
+                case 'customer_returned_to_queue':
+                    // Current customer status changed, update queue positions
+                    if (currentCustomer) {
+                        updateQueuePosition();
+
+                        const action = eventData.data?.action;
+                        if (action === 'complete') {
+                            showNotification('A customer\'s ride was completed by staff', 'success');
+                        } else if (action === 'return' || eventData.type === 'customer_returned_to_queue') {
+                            showNotification('Queue positions updated due to operational changes', 'info');
+                        }
+                    }
+                    break;
+
+                default:
+                    console.log('Unknown event type:', eventData.type);
+            }
         }
 
         function showNotification(message, type = 'info') {

@@ -15,25 +15,26 @@
     <style>
         .driver-dashboard {
             min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             padding-bottom: 2rem;
         }
 
         .driver-header {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid #404040;
             backdrop-filter: blur(10px);
             padding: 1rem 0;
             margin-bottom: 2rem;
         }
 
         .dashboard-title {
-            color: white;
+            color: #e0e0e0;
             font-weight: 600;
             margin: 0;
         }
 
         .connection-status {
-            color: white;
+            color: #e0e0e0;
         }
 
         .status-indicator {
@@ -115,14 +116,14 @@
         }
 
         .complete-ride-btn {
-            background: linear-gradient(45deg, #28a745, #20c997);
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
             border: none;
             font-size: 1.5rem;
             padding: 1.25rem 2rem;
             border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
             transition: all 0.3s ease;
-            color: white;
+            color: #1a1a1a;
             font-weight: 600;
             letter-spacing: 0.5px;
             position: relative;
@@ -131,9 +132,9 @@
 
         .complete-ride-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
-            background: linear-gradient(45deg, #218838, #1e7e34);
-            color: white;
+            box-shadow: 0 12px 35px rgba(0, 255, 136, 0.6);
+            background: linear-gradient(45deg, #00e67a, #00b359);
+            color: #1a1a1a;
         }
 
         .complete-ride-btn:active {
@@ -141,8 +142,8 @@
         }
 
         .complete-ride-btn:focus {
-            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
-            color: white;
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.4);
+            color: #1a1a1a;
         }
 
         .keyboard-hint kbd {
@@ -450,60 +451,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Mock data for demonstration
-        const mockCustomers = [
-            {
-                queueEntryId: '123e4567-e89b-12d3-a456-426614174000',
-                customerId: '123e4567-e89b-12d3-a456-426614174001',
-                customerName: 'Mike Johnson',
-                displayName: 'Mike Johnson',
-                phoneNumber: '555-0123',
-                position: 1,
-                paymentMethod: 'CashApp',
-                paymentAmount: 25.00,
-                queuedAt: new Date(Date.now() - 8 * 60000), // 8 minutes ago
-                arrivalTimeDisplay: '2:15 PM'
-            },
-            {
-                queueEntryId: '123e4567-e89b-12d3-a456-426614174002',
-                customerId: '123e4567-e89b-12d3-a456-426614174003',
-                customerName: 'Sarah Smith',
-                displayName: 'Sarah Smith',
-                phoneNumber: '555-0124',
-                position: 2,
-                paymentMethod: 'PayPal',
-                paymentAmount: 25.00,
-                queuedAt: new Date(Date.now() - 5 * 60000), // 5 minutes ago
-                arrivalTimeDisplay: '2:18 PM'
-            },
-            {
-                queueEntryId: '123e4567-e89b-12d3-a456-426614174004',
-                customerId: '123e4567-e89b-12d3-a456-426614174005',
-                customerName: 'John Smith',
-                displayName: 'John Smith (arrived 2:20 PM)',
-                phoneNumber: '555-0125',
-                position: 3,
-                paymentMethod: 'CashInHand',
-                paymentAmount: 25.00,
-                queuedAt: new Date(Date.now() - 3 * 60000), // 3 minutes ago
-                arrivalTimeDisplay: '2:20 PM'
-            },
-            {
-                queueEntryId: '123e4567-e89b-12d3-a456-426614174006',
-                customerId: '123e4567-e89b-12d3-a456-426614174007',
-                customerName: 'John Smith',
-                displayName: 'John Smith (arrived 2:21 PM)',
-                phoneNumber: '555-0126',
-                position: 4,
-                paymentMethod: 'CashApp',
-                paymentAmount: 25.00,
-                queuedAt: new Date(Date.now() - 2 * 60000), // 2 minutes ago
-                arrivalTimeDisplay: '2:21 PM'
-            }
-        ];
+        // API Configuration
+        const API_BASE = 'http://localhost:3001/api';
 
-        let currentCustomerIndex = 0;
-        let ridesCompleted = 7;
+        // State variables
+        let currentCustomer = null;
+        let queueData = [];
+        let ridesCompleted = 0;
+        let connectionStatus = 'connected';
 
         class DriverDashboardDemo {
             constructor() {
@@ -512,17 +467,17 @@
                 this.refreshDashboard = this.refreshDashboard.bind(this);
             }
 
-            initialize() {
-                console.log('Initializing Driver Dashboard Demo...');
+            async initialize() {
+                console.log('Initializing Driver Dashboard...');
 
                 this.setupEventListeners();
                 this.setupKeyboardShortcuts();
-                this.loadCurrentCustomer();
-                this.loadUpcomingCustomers();
+                this.setupEventBroadcasting();
+                await this.loadDashboardData();
                 this.updateLastUpdated();
                 this.startAutoRefresh();
 
-                console.log('Driver Dashboard Demo initialized successfully');
+                console.log('Driver Dashboard initialized successfully');
             }
 
             setupEventListeners() {
@@ -574,18 +529,50 @@
                 }
             }
 
-            loadCurrentCustomer() {
+            async loadDashboardData() {
+                try {
+                    await Promise.all([
+                        this.loadCurrentCustomer(),
+                        this.loadQueueData(),
+                        this.loadStats()
+                    ]);
+                    this.updateConnectionStatus('connected');
+                } catch (error) {
+                    console.error('Error loading dashboard data:', error);
+                    this.updateConnectionStatus('disconnected');
+                }
+            }
+
+            async loadCurrentCustomer() {
                 const container = document.getElementById('currentCustomerContent');
                 if (!container) return;
 
-                if (currentCustomerIndex < mockCustomers.length) {
-                    const customer = mockCustomers[currentCustomerIndex];
-                    const customerHtml = this.buildCurrentCustomerHtml(customer);
-                    container.innerHTML = customerHtml;
-                    this.updateCompleteButton(true);
-                } else {
+                try {
+                    const response = await fetch(`${API_BASE}/queue/current`);
+
+                    if (response.status === 204) {
+                        // No current customer
+                        currentCustomer = null;
+                        this.showNoCustomer();
+                        this.updateCompleteButton(false);
+                        return;
+                    }
+
+                    const result = await response.json();
+                    if (result.success) {
+                        currentCustomer = result.data;
+                        const customerHtml = this.buildCurrentCustomerHtml(currentCustomer);
+                        container.innerHTML = customerHtml;
+                        this.updateCompleteButton(true);
+                    } else {
+                        throw new Error(result.message || 'Failed to load current customer');
+                    }
+                } catch (error) {
+                    console.error('Error loading current customer:', error);
+                    currentCustomer = null;
                     this.showNoCustomer();
                     this.updateCompleteButton(false);
+                    this.showNotification('Failed to load current customer', 'error');
                 }
             }
 
@@ -594,15 +581,20 @@
                 const isLongWait = waitTime.totalMinutes > 10;
                 const isVeryLongWait = waitTime.totalMinutes > 20;
 
+                // Extract data from API response structure
+                const customerData = customer.customer;
+                const paymentData = customer.payment;
+                const queuedTime = new Date(customer.queuedAt);
+                const arrivalTimeDisplay = queuedTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
                 return `
-                    <div class="current-customer-display" data-queue-entry-id="${customer.queueEntryId}">
+                    <div class="current-customer-display" data-queue-entry-id="${customer.id}">
                         <div class="customer-name-section">
-                            <h2 class="customer-name-large">${customer.customerName}</h2>
-                            ${customer.customerName !== customer.displayName ?
-                                `<div class="disambiguation-time">
-                                    <i class="fas fa-clock"></i>
-                                    Arrived at ${customer.arrivalTimeDisplay}
-                                </div>` : ''}
+                            <h2 class="customer-name-large">${customerData.name}</h2>
+                            <div class="disambiguation-time">
+                                <i class="fas fa-clock"></i>
+                                Started at ${arrivalTimeDisplay}
+                            </div>
                         </div>
 
                         <div class="customer-details-grid">
@@ -622,18 +614,18 @@
                             <div class="detail-item">
                                 <div class="detail-label">Payment</div>
                                 <div class="detail-value">
-                                    ${customer.paymentMethod}
-                                    <small class="d-block text-muted">$${customer.paymentAmount.toFixed(2)}</small>
+                                    ${paymentData.paymentMethod}
+                                    <small class="d-block text-muted">$${paymentData.amount.toFixed(2)}</small>
                                 </div>
                             </div>
 
-                            ${customer.phoneNumber ? `
+                            ${customerData.phoneNumber ? `
                                 <div class="detail-item">
                                     <div class="detail-label">Contact</div>
                                     <div class="detail-value">
-                                        <a href="tel:${customer.phoneNumber}" class="text-decoration-none">
+                                        <a href="tel:${customerData.phoneNumber}" class="text-decoration-none">
                                             <i class="fas fa-phone"></i>
-                                            ${customer.phoneNumber}
+                                            ${customerData.phoneNumber}
                                         </a>
                                     </div>
                                 </div>
@@ -656,10 +648,10 @@
                         <div class="action-section mt-4">
                             <button id="completeCurrentRideBtn"
                                     class="btn complete-ride-btn btn-lg w-100"
-                                    data-queue-entry-id="${customer.queueEntryId}"
-                                    data-customer-name="${customer.customerName}">
+                                    data-queue-entry-id="${customer.id}"
+                                    data-customer-name="${customerData.name}">
                                 <i class="fas fa-check-circle"></i>
-                                Complete Ride for ${customer.customerName}
+                                Complete Ride for ${customerData.name}
                             </button>
 
                             <div class="keyboard-hint text-center mt-2">
@@ -685,19 +677,37 @@
                 }
             }
 
-            loadUpcomingCustomers() {
+            async loadQueueData() {
+                try {
+                    const response = await fetch(`${API_BASE}/queue`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        queueData = result.data || [];
+                        this.renderUpcomingCustomers();
+                    } else {
+                        throw new Error(result.message || 'Failed to load queue data');
+                    }
+                } catch (error) {
+                    console.error('Error loading queue data:', error);
+                    queueData = [];
+                    this.renderUpcomingCustomers();
+                    this.showNotification('Failed to load queue data', 'error');
+                }
+            }
+
+            renderUpcomingCustomers() {
                 const container = document.getElementById('upcomingCustomers');
                 if (!container) return;
 
-                const upcomingCustomers = mockCustomers
-                    .slice(currentCustomerIndex + 1, currentCustomerIndex + 4)
-                    .map((customer, index) => ({
-                        ...customer,
-                        position: index + 2 // Adjust position for upcoming customers
-                    }));
+                // Get waiting customers, sorted by position
+                const waitingCustomers = queueData
+                    .filter(customer => customer.status === 'Waiting')
+                    .sort((a, b) => a.position - b.position)
+                    .slice(0, 3); // Show next 3 customers
 
-                if (upcomingCustomers.length > 0) {
-                    container.innerHTML = upcomingCustomers
+                if (waitingCustomers.length > 0) {
+                    container.innerHTML = waitingCustomers
                         .map(customer => this.buildUpcomingCustomerHtml(customer))
                         .join('');
                 } else {
@@ -712,7 +722,7 @@
                 // Update queue length
                 const queueLengthEl = document.getElementById('queueLength');
                 if (queueLengthEl) {
-                    queueLengthEl.textContent = Math.max(0, mockCustomers.length - currentCustomerIndex);
+                    queueLengthEl.textContent = waitingCustomers.length;
                 }
             }
 
@@ -720,11 +730,15 @@
                 const waitTime = this.calculateWaitTime(customer.queuedAt);
                 const isLongWait = waitTime.totalMinutes > 10;
 
+                // Extract data from API response structure
+                const customerData = customer.customer;
+                const paymentData = customer.payment;
+
                 return `
                     <div class="upcoming-customer-item">
                         <div class="customer-info">
                             <div class="customer-name">
-                                ${customer.displayName}
+                                ${customerData.name}
                             </div>
                             <div class="customer-details">
                                 <span class="position-badge">Position ${customer.position}</span>
@@ -773,12 +787,11 @@
             }
 
             async completeCurrentRide() {
-                if (currentCustomerIndex >= mockCustomers.length) {
-                    alert('No customer to complete');
+                if (!currentCustomer) {
+                    this.showNotification('No customer to complete', 'error');
                     return;
                 }
 
-                const customer = mockCustomers[currentCustomerIndex];
                 const completeBtn = document.getElementById('completeCurrentRideBtn');
 
                 if (completeBtn) {
@@ -786,30 +799,59 @@
                     completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Completing...';
                 }
 
-                // Simulate API call delay
-                setTimeout(() => {
-                    ridesCompleted++;
-                    currentCustomerIndex++;
+                try {
+                    const response = await fetch(`${API_BASE}/queue/${currentCustomer.id}/complete`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            completedBy: 'driver@example.com',
+                            reason: 'Ride completed successfully',
+                            notes: 'Driver completed ride via dashboard'
+                        })
+                    });
 
-                    // Update rides completed counter
-                    const ridesCompletedEl = document.getElementById('ridesCompleted');
-                    if (ridesCompletedEl) {
-                        ridesCompletedEl.textContent = ridesCompleted;
+                    const result = await response.json();
+
+                    if (result.success) {
+                        ridesCompleted++;
+
+                        // Update rides completed counter
+                        const ridesCompletedEl = document.getElementById('ridesCompleted');
+                        if (ridesCompletedEl) {
+                            ridesCompletedEl.textContent = ridesCompleted;
+                        }
+
+                        // Show completion modal
+                        this.showCompletionModal(currentCustomer.customer.name);
+
+                        // Broadcast event for real-time updates
+                        this.broadcastEvent('ride_completed', {
+                            customer: currentCustomer,
+                            completedBy: 'driver@example.com',
+                            timestamp: new Date().toISOString()
+                        });
+
+                        this.showNotification('Ride completed successfully!', 'success');
+
+                        // Auto-refresh to get next customer after short delay
+                        setTimeout(async () => {
+                            await this.loadDashboardData();
+                            this.updateLastUpdated();
+                        }, 1500);
+
+                    } else {
+                        throw new Error(result.message || 'Failed to complete ride');
                     }
+                } catch (error) {
+                    console.error('Error completing ride:', error);
+                    this.showNotification('Failed to complete ride: ' + error.message, 'error');
 
-                    // Show completion modal
-                    this.showCompletionModal(customer.customerName);
-
-                    // Auto-refresh to get next customer
-                    setTimeout(() => {
-                        this.loadCurrentCustomer();
-                        this.loadUpcomingCustomers();
-                        this.updateLastUpdated();
-                    }, 1500);
-
-                    this.showNotification('Ride completed successfully!', 'success');
-
-                }, 1000);
+                    // Re-enable button on error
+                    if (completeBtn) {
+                        completeBtn.disabled = false;
+                        completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> Complete Ride for ' + currentCustomer.customer.name;
+                    }
+                }
             }
 
             showCompletionModal(customerName) {
@@ -847,21 +889,94 @@
                 }
             }
 
-            refreshDashboard() {
+            async loadStats() {
+                try {
+                    const response = await fetch(`${API_BASE}/stats`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        ridesCompleted = result.data.completedRides || 0;
+                        const ridesCompletedEl = document.getElementById('ridesCompleted');
+                        if (ridesCompletedEl) {
+                            ridesCompletedEl.textContent = ridesCompleted;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading stats:', error);
+                }
+            }
+
+            updateConnectionStatus(status) {
+                connectionStatus = status;
+                const statusEl = document.getElementById('connectionStatus');
+                const textEl = document.getElementById('connectionText');
+
+                if (statusEl && textEl) {
+                    statusEl.className = `status-indicator ${status}`;
+                    switch (status) {
+                        case 'connected':
+                            textEl.textContent = 'Connected';
+                            break;
+                        case 'connecting':
+                            textEl.textContent = 'Connecting...';
+                            break;
+                        case 'disconnected':
+                            textEl.textContent = 'Disconnected';
+                            break;
+                    }
+                }
+            }
+
+            setupEventBroadcasting() {
+                // Listen for storage events from other windows/tabs
+                window.addEventListener('storage', (event) => {
+                    if (event.key === 'driftride_event') {
+                        const eventData = JSON.parse(event.newValue);
+                        this.handleBroadcastEvent(eventData);
+                    }
+                });
+            }
+
+            broadcastEvent(type, data = {}) {
+                const eventData = {
+                    type: type,
+                    timestamp: new Date().toISOString(),
+                    source: 'driver-dashboard',
+                    data: data
+                };
+
+                // Use localStorage to broadcast to other windows/tabs
+                localStorage.setItem('driftride_event', JSON.stringify(eventData));
+
+                // Clear the event after a short delay to trigger storage event
+                setTimeout(() => {
+                    localStorage.removeItem('driftride_event');
+                }, 100);
+            }
+
+            handleBroadcastEvent(eventData) {
+                console.log('Received broadcast event:', eventData);
+                // Driver dashboard could respond to events from sales dashboard here
+                // For now, we'll just refresh data on relevant events
+                if (eventData.type === 'queue_updated' || eventData.type === 'track_mode_changed') {
+                    this.loadDashboardData();
+                }
+            }
+
+            async refreshDashboard() {
                 console.log('Refreshing dashboard...');
-                this.loadCurrentCustomer();
-                this.loadUpcomingCustomers();
+                this.updateConnectionStatus('connecting');
+                await this.loadDashboardData();
                 this.updateLastUpdated();
                 this.showNotification('Dashboard refreshed', 'success');
             }
 
             startAutoRefresh() {
-                setInterval(() => {
+                setInterval(async () => {
                     this.updateLastUpdated();
 
-                    // Update wait times every 30 seconds
-                    this.loadCurrentCustomer();
-                    this.loadUpcomingCustomers();
+                    // Update data every 30 seconds
+                    await this.loadDashboardData();
                 }, 30000);
             }
         }

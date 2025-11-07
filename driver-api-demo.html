@@ -13,9 +13,9 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             min-height: 100vh;
-            color: #333;
+            color: #e0e0e0;
         }
 
         .container {
@@ -49,40 +49,45 @@
         }
 
         .stat-card {
-            background: white;
+            background: #2a2a2a;
+            border: 1px solid #404040;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             text-align: center;
         }
 
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #667eea;
+            color: #00d4ff;
             margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
         }
 
         .stat-label {
-            color: #6b7280;
+            color: #b0b0b0;
             font-size: 0.9rem;
             text-transform: uppercase;
             font-weight: 600;
         }
 
         .current-customer {
-            background: white;
+            background: #2a2a2a;
+            border: 1px solid #404040;
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             overflow: hidden;
             margin-bottom: 30px;
         }
 
         .customer-header {
-            background: #4a5568;
-            color: white;
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: #1a1a1a;
             padding: 20px;
             text-align: center;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
         }
 
         .customer-header h2 {
@@ -98,8 +103,9 @@
         .customer-name {
             font-size: 3rem;
             font-weight: bold;
-            color: #2d3748;
+            color: #ffffff;
             margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         .customer-details {
@@ -110,15 +116,16 @@
         }
 
         .detail-item {
-            background: #f7fafc;
+            background: #1a1a1a;
             padding: 15px;
             border-radius: 10px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #00d4ff;
+            border: 1px solid #404040;
         }
 
         .detail-label {
             font-size: 0.9rem;
-            color: #6b7280;
+            color: #b0b0b0;
             text-transform: uppercase;
             font-weight: 600;
             margin-bottom: 5px;
@@ -127,30 +134,31 @@
         .detail-value {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #2d3748;
+            color: #e0e0e0;
         }
 
         .complete-btn {
-            background: #48bb78;
-            color: white;
+            background: linear-gradient(45deg, #00ff88, #00cc6a);
+            color: #1a1a1a;
             border: none;
             padding: 20px 40px;
             border-radius: 50px;
             font-size: 1.3rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 10px 20px rgba(72, 187, 120, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.3);
         }
 
         .complete-btn:hover {
-            background: #38a169;
+            background: linear-gradient(45deg, #00ff99, #00dd77);
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(72, 187, 120, 0.4);
+            box-shadow: 0 15px 30px rgba(0, 255, 136, 0.4);
         }
 
         .complete-btn:disabled {
-            background: #a0aec0;
+            background: #404040;
+            color: #808080;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -158,7 +166,7 @@
 
         .empty-state {
             text-align: center;
-            color: #6b7280;
+            color: #b0b0b0;
             padding: 60px 40px;
         }
 
@@ -170,23 +178,26 @@
 
         .empty-state h3 {
             margin-bottom: 10px;
-            color: #4a5568;
+            color: #e0e0e0;
         }
 
         .queue-preview {
-            background: white;
+            background: #2a2a2a;
+            border: 1px solid #404040;
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             overflow: hidden;
         }
 
         .queue-header {
-            background: #4a5568;
-            color: white;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #1a1a1a;
             padding: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
         }
 
         .queue-header h3 {
@@ -366,12 +377,14 @@
                 this.currentCustomer = null;
                 this.queue = [];
                 this.stats = {};
+                this.eventChannel = 'driftride_queue_updates';
 
                 this.init();
             }
 
             async init() {
                 await this.loadData();
+                this.setupEventBroadcasting();
                 this.startPolling();
                 this.setupEventListeners();
                 this.showNotification('Driver Dashboard loaded successfully!', 'success');
@@ -597,10 +610,110 @@
             }
 
             startPolling() {
-                // Refresh every 5 seconds for real-time updates
+                // Refresh every 30 seconds as backup (real-time updates via events)
                 setInterval(() => {
                     this.loadData();
-                }, 5000);
+                }, 30000);
+            }
+
+            setupEventBroadcasting() {
+                // Listen for storage events from other windows/tabs (sales dashboard)
+                window.addEventListener('storage', (event) => {
+                    if (event.key === this.eventChannel && event.newValue) {
+                        const eventData = JSON.parse(event.newValue);
+                        this.handleBroadcastEvent(eventData);
+                    }
+                });
+            }
+
+            handleBroadcastEvent(eventData) {
+                console.log('Driver received broadcast event:', eventData);
+
+                // Handle different event types from sales dashboard
+                switch (eventData.type) {
+                    case 'queue_reordered':
+                    case 'customer_prioritized':
+                        // Immediately refresh queue when sales makes changes
+                        this.loadQueue();
+                        this.showNotification('Queue updated by sales staff', 'info');
+
+                        // Add visual indicator for immediate feedback
+                        const queueSection = document.querySelector('.queue-preview');
+                        if (queueSection) {
+                            queueSection.style.border = '2px solid #48bb78';
+                            setTimeout(() => {
+                                queueSection.style.border = '';
+                            }, 1000);
+                        }
+                        break;
+
+                    case 'current_customer_changed':
+                        // Sales has completed or returned the current customer
+                        this.loadCurrentCustomer();
+                        this.loadQueue();
+
+                        const action = eventData.data?.action;
+                        if (action === 'complete') {
+                            this.showNotification('Current customer marked complete by sales staff', 'success');
+
+                            // Add success indicator to current customer section
+                            const currentSection = document.querySelector('.current-customer');
+                            if (currentSection) {
+                                currentSection.style.border = '3px solid #10b981';
+                                setTimeout(() => {
+                                    currentSection.style.border = '';
+                                }, 2000);
+                            }
+                        } else if (action === 'return') {
+                            this.showNotification('Current customer returned to queue by sales staff', 'warning');
+
+                            // Add warning indicator to current customer section
+                            const currentSection = document.querySelector('.current-customer');
+                            if (currentSection) {
+                                currentSection.style.border = '3px solid #f59e0b';
+                                setTimeout(() => {
+                                    currentSection.style.border = '';
+                                }, 2000);
+                            }
+                        }
+                        break;
+
+                    case 'customer_returned_to_queue':
+                        // Customer was returned to queue from current position
+                        this.loadCurrentCustomer();
+                        this.loadQueue();
+                        this.showNotification('Customer returned to queue by sales staff', 'info');
+
+                        // Add visual indicator for queue changes
+                        const queueSection2 = document.querySelector('.queue-preview');
+                        if (queueSection2) {
+                            queueSection2.style.border = '2px solid #f59e0b';
+                            setTimeout(() => {
+                                queueSection2.style.border = '';
+                            }, 1500);
+                        }
+                        break;
+
+                    case 'customer_restored':
+                        // Customer has been restored from completed rides back to queue
+                        this.loadQueue();
+                        this.loadCurrentCustomer();
+                        const customerName = eventData.data?.customer?.name || 'Customer';
+                        this.showNotification(`${customerName} restored to queue by sales staff`, 'warning');
+
+                        // Add visual indicator for restore action
+                        const queueSection3 = document.querySelector('.queue-preview');
+                        if (queueSection3) {
+                            queueSection3.style.border = '2px solid #8b5cf6';
+                            setTimeout(() => {
+                                queueSection3.style.border = '';
+                            }, 1500);
+                        }
+                        break;
+
+                    default:
+                        console.log('Unknown event type:', eventData.type);
+                }
             }
 
             showNotification(message, type = 'info') {

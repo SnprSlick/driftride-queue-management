@@ -13,9 +13,9 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
             min-height: 100vh;
-            color: #333;
+            color: #e0e0e0;
         }
 
         .container {
@@ -42,31 +42,520 @@
         }
 
         .dashboard {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Main Layout - Vertical Structure */
+        .main-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Table Styles */
+        .data-table {
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 3px;
+            overflow: hidden;
+            clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.1);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #404040, #353535);
+            color: #00d4ff;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #505050;
+        }
+
+        .table-header h2 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .table-badge {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            padding: 3px 8px;
+            border-radius: 2px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .table-content {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .table-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 5px 8px;
+            border-bottom: 1px solid #333;
+            transition: background 0.2s;
+            min-height: 44px;
+        }
+
+        .table-row:hover {
+            background: #252525;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .table-cell {
+            color: #e0e0e0;
+            font-size: 0.85rem;
+        }
+
+        .table-cell.name {
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .table-cell.urgent {
+            color: #ff4757;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .mobile-details {
+            font-size: 0.75rem;
+            color: #b0b0b0;
+            margin-top: 2px;
+            display: none;
+        }
+
+        /* Current Customer Single Line */
+        .current-customer-line {
+            background: #1a2a3a;
+            border: 2px solid #00ff88;
+            border-radius: 3px;
+            padding: 8px 12px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 15px;
+            clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+
+        .customer-info-line {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            align-items: center;
+        }
+
+        .customer-info-item {
+            font-size: 0.85rem;
+        }
+
+        .customer-info-label {
+            color: #b0b0b0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .customer-info-value {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .customer-actions-line {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* Compact Buttons */
+        .btn-compact {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 2px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-compact:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Action Button Colors */
+        .btn-approve {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #38a169;
+        }
+
+        .btn-deny {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-deny:hover {
+            background: #c53030;
+        }
+
+        .btn-start {
+            background: #00d4ff;
+            color: #1a1a1a;
+        }
+
+        .btn-start:hover {
+            background: #0099cc;
+        }
+
+        .btn-priority {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-priority:hover {
+            background: #d69e2e;
+        }
+
+        .btn-remove {
+            background: #9ca3af;
+            color: white;
+        }
+
+        .btn-remove:hover {
+            background: #6b7280;
+        }
+
+        .btn-complete {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #059669;
+        }
+
+        .btn-return {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-return:hover {
+            background: #d97706;
+        }
+
+        /* Empty States */
+        .empty-state-compact {
+            text-align: center;
+            color: #6b7280;
+            padding: 20px;
+            font-size: 0.9rem;
+        }
+
+        .empty-state-compact .icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            opacity: 0.5;
+        }
+
+        /* Inline Header with Track Status */
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 8px 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid #404040;
+            margin-bottom: 10px;
+        }
+
+        .track-status-inline {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: #e0e0e0;
+        }
+
+        .track-status-label {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: linear-gradient(to right, #dc2626 0%, #dc2626 50%, #2563eb 50%, #2563eb 100%);
+            border-radius: 12px;
+            border: 2px solid #404040;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.1);
+        }
+
+        .toggle-switch:hover {
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .toggle-switch.cold .toggle-slider {
+            transform: translateX(24px);
+        }
+
+        .toggle-switch.hot .toggle-slider::before {
+            content: "🔥";
+        }
+
+        .toggle-switch.cold .toggle-slider::before {
+            content: "❄️";
+        }
+
+        .track-mode-text {
+            font-size: 0.85rem;
+            color: #b0b0b0;
+            font-weight: 600;
+            min-width: 70px;
+        }
+
+        .track-mode-text.hot {
+            color: #dc2626;
+        }
+
+        .track-mode-text.cold {
+            color: #2563eb;
+        }
+
+        /* Minimized Pending Payments Section */
+        .data-table.minimized {
+            margin-bottom: 8px;
+        }
+
+        .data-table.minimized .table-header {
+            padding: 4px 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .data-table.minimized .table-header:hover {
+            background: linear-gradient(135deg, #505050, #454545);
+        }
+
+        .data-table.minimized .table-header h2 {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        .data-table.minimized .table-badge {
+            font-size: 0.65rem;
+            background: rgba(0, 212, 255, 0.1);
+            color: #6b7280;
+        }
+
+        .data-table.minimized .table-content {
+            display: none;
+        }
+
+        .data-table.expanded .table-content {
+            display: block;
+        }
+
+        /* Completed rides styles */
+        .completed-panel {
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            height: fit-content;
+        }
+
+        .completed-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .completed-item {
+            padding: 20px;
+            border-bottom: 1px solid #404040;
+            transition: all 0.3s ease;
+        }
+
+        .completed-item:hover {
+            background: #333333;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .completed-item:last-child {
+            border-bottom: none;
+        }
+
+        .completed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .completed-customer {
+            flex-grow: 1;
+        }
+
+        .completed-customer h4 {
+            margin: 0 0 5px 0;
+            color: #e0e0e0;
+            font-size: 1.1rem;
+        }
+
+        .completed-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .completed-details {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .restore-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .restore-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
         }
 
         .queue-panel, .pending-panel {
-            background: white;
+            background: #2a2a2a;
+            border: 1px solid #404040;
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             overflow: hidden;
         }
 
         .panel-header {
-            background: #4a5568;
-            color: white;
+            background: linear-gradient(135deg, #404040, #353535);
+            color: #e0e0e0;
             padding: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 1px solid #505050;
         }
 
         .panel-header h2 {
             margin: 0;
             font-size: 1.3rem;
             font-weight: 500;
+            color: #00d4ff;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .track-mode-controls {
+            display: flex;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .track-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .track-button.hot-track {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.4);
+        }
+
+        .track-button.hot-track.active {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.6);
+            border: 1px solid #ff4757;
+        }
+
+        .track-button.cold-track {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            border: 1px solid rgba(0, 212, 255, 0.4);
+        }
+
+        .track-button.cold-track.active {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #1a1a1a;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+            border: 1px solid #00d4ff;
+        }
+
+        .track-button:hover {
+            transform: translateY(-1px);
         }
 
         .panel-content {
@@ -76,20 +565,22 @@
         }
 
         .queue-item {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            border-radius: 3px;
             padding: 15px;
             margin-bottom: 15px;
             cursor: move;
             transition: all 0.2s;
             position: relative;
+            clip-path: polygon(5px 0%, 100% 0%, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0% 100%, 0% 5px);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.1);
         }
 
         .queue-item:hover {
-            border-color: #667eea;
+            border-color: #00d4ff;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.05);
         }
 
         .queue-item.dragging {
@@ -98,25 +589,27 @@
         }
 
         .queue-item.drag-over {
-            border-color: #48bb78;
-            background: #f0fff4;
+            border-color: #00ff88;
+            background: #0a2a1a;
             border-style: dashed;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
         }
 
         .queue-position {
             position: absolute;
             top: -10px;
             left: -10px;
-            background: #667eea;
-            color: white;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: #1a1a1a;
             width: 30px;
             height: 30px;
-            border-radius: 50%;
+            clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             font-size: 0.9rem;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
         }
 
         .queue-position.current {
@@ -229,30 +722,36 @@
         .statistics {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .stat-card {
-            background: white;
+            background: #1a1a1a;
+            border: 2px solid #404040;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.1), inset 0 0 30px rgba(0, 212, 255, 0.02);
             text-align: center;
+            position: relative;
         }
 
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            color: #667eea;
+            color: #00d4ff;
             margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+            font-family: 'Courier New', monospace;
         }
 
         .stat-label {
-            color: #6b7280;
+            color: #e0e0e0;
             font-size: 0.9rem;
             text-transform: uppercase;
             font-weight: 600;
+            letter-spacing: 1px;
         }
 
         .drag-instruction {
@@ -271,6 +770,360 @@
             font-family: monospace;
         }
 
+        .current-customer-panel {
+            background: #1a2a3a;
+            border-radius: 3px;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2), inset 0 0 50px rgba(0, 255, 136, 0.03);
+            margin-bottom: 30px;
+            border: 3px solid #00ff88;
+            overflow: hidden;
+            clip-path: polygon(15px 0%, 100% 0%, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0% 100%, 0% 15px);
+            position: relative;
+        }
+
+        .current-customer-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .current-customer-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-customer-status {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .current-customer-content {
+            padding: 30px;
+        }
+
+        .current-customer-empty {
+            text-align: center;
+            color: #b0b0b0;
+            padding: 40px;
+        }
+
+        .current-customer-empty .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .customer-display {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .customer-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .customer-detail-item {
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            padding: 15px;
+            border-radius: 2px;
+            border-left: 4px solid #00ff88;
+            clip-path: polygon(6px 0%, 100% 0%, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0% 100%, 0% 6px);
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.1);
+        }
+
+        .customer-detail-label {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .customer-detail-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+        }
+
+        .customer-name-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .customer-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 200px;
+        }
+
+        .customer-action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-complete {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-return {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-return:hover {
+            background: #d97706;
+            transform: translateY(-1px);
+        }
+
+        .wait-time {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .wait-time.long {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: #2a2a2a;
+            border: 2px solid #404040;
+            border-radius: 3px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.3), inset 0 0 30px rgba(0, 212, 255, 0.05);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            clip-path: polygon(12px 0%, 100% 0%, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0% 100%, 0% 12px);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+            color: #ffffff;
+        }
+
+        .replacement-arrow {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #667eea;
+            margin: 0.5rem 0;
+            font-weight: bold;
+        }
+
+        .modal-customer {
+            background: #1a1a1a;
+            border: 2px solid #404040;
+            padding: 15px;
+            border-radius: 2px;
+            margin-bottom: 25px;
+            text-align: center;
+            clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+        }
+
+        .modal-customer-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .modal-customer-details {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h4 {
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+            color: #ffffff;
+        }
+
+        .modal-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-option {
+            padding: 15px;
+            border: 2px solid #404040;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            background: #1a1a1a;
+            clip-path: polygon(6px 0%, 100% 0%, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0% 100%, 0% 6px);
+        }
+
+        .modal-option:hover {
+            border-color: #00d4ff;
+            background: #0a2a3a;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .modal-option.selected {
+            border-color: #00d4ff;
+            background: #0a2a3a;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .modal-option-title {
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .modal-option-desc {
+            font-size: 0.85rem;
+            color: #b0b0b0;
+        }
+
+        .modal-notes {
+            margin-bottom: 25px;
+        }
+
+        .modal-notes label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+
+        .modal-notes textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        .modal-notes textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .modal-btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .modal-btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .modal-btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
         .empty-state {
             text-align: center;
             color: #6b7280;
@@ -283,93 +1136,524 @@
             opacity: 0.5;
         }
 
-        @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
+        /* High-Tech Visual Effects */
+        .tech-grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            opacity: 0.6;
+        }
+
+        .current-customer-panel::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(45deg, #00ff88, #00d4ff, #ff0066, #00ff88);
+            background-size: 400% 400%;
+            animation: holographicBorder 4s ease infinite;
+            z-index: -1;
+            clip-path: inherit;
+        }
+
+        @keyframes holographicBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Mobile-First Responsive Design - Optimized for Information Density */
+        @media (max-width: 480px) {
+            .container {
+                padding: 5px;
             }
 
-            .statistics {
-                grid-template-columns: repeat(2, 1fr);
+            .header {
+                padding: 6px 8px;
+                margin-bottom: 8px;
             }
 
-            .customer-info {
-                flex-direction: column;
-                align-items: flex-start;
+            .track-status-inline {
+                gap: 8px;
+                font-size: 0.8rem;
+            }
+
+            .track-status-label {
+                font-size: 0.75rem;
+            }
+
+            .toggle-switch {
+                width: 40px;
+                height: 20px;
+            }
+
+            .toggle-slider {
+                width: 14px;
+                height: 14px;
+                top: 2px;
+                left: 2px;
+                font-size: 0.6rem;
+            }
+
+            .toggle-switch.cold .toggle-slider {
+                transform: translateX(18px);
+            }
+
+            .track-mode-text {
+                font-size: 0.75rem;
+                min-width: 55px;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+                margin-bottom: 5px;
+            }
+
+            .header p {
+                font-size: 0.8rem;
+            }
+
+            /* Maximum information density layout */
+            .main-layout {
+                gap: 8px;
+            }
+
+            /* Compact table headers */
+            .table-header {
+                padding: 5px 8px;
+            }
+
+            .table-header h2 {
+                font-size: 1rem;
+            }
+
+            .table-badge {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+            }
+
+            /* Compact table rows */
+            .table-row {
+                grid-template-columns: 2.5fr 1fr auto;
+                gap: 6px;
+                padding: 4px 6px;
+                min-height: 40px;
+            }
+
+            .table-cell {
+                font-size: 0.75rem;
+            }
+
+            .table-cell.name {
+                font-size: 0.8rem;
+            }
+
+            /* Compact current customer line */
+            .current-customer-line {
+                padding: 6px 8px;
                 gap: 10px;
             }
 
-            .customer-actions {
-                width: 100%;
-                justify-content: flex-end;
+            .customer-info-line {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .customer-info-item {
+                font-size: 0.75rem;
+            }
+
+            .customer-info-label {
+                font-size: 0.65rem;
+                margin-bottom: 1px;
+            }
+
+            .customer-actions-line {
+                gap: 4px;
+            }
+
+            .track-mode-controls {
+                margin-left: 6px !important;
+            }
+
+            /* Ultra compact buttons */
+            .btn-compact {
+                padding: 4px 8px;
+                font-size: 0.7rem;
+                min-height: 28px;
+                gap: 2px;
+            }
+
+            /* Compact statistics */
+            .statistics {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+                margin-top: 10px;
+            }
+
+            .stat-card {
+                padding: 8px 6px;
+            }
+
+            .stat-value {
+                font-size: 1.2rem;
+                margin-bottom: 2px;
+            }
+
+            .stat-label {
+                font-size: 0.7rem;
+            }
+
+            /* Compact empty states */
+            .empty-state-compact {
+                padding: 15px;
+                font-size: 0.8rem;
+            }
+
+            .empty-state-compact .icon {
+                font-size: 1.3rem;
+                margin-bottom: 6px;
+            }
+
+            /* Mobile table structure - Stack info on mobile */
+            .table-row {
+                grid-template-columns: 1fr auto;
+                gap: 8px;
+                padding: 6px;
+            }
+
+            /* Stack customer info vertically */
+            .table-cell:nth-child(1)::after {
+                content: " • " attr(data-phone) " • " attr(data-amount) " • " attr(data-time);
+                display: block;
+                font-size: 0.65rem;
+                color: #b0b0b0;
+                margin-top: 2px;
+            }
+
+            /* Hide individual data cells on mobile, show mobile details instead */
+            .table-cell:nth-child(2),
+            .table-cell:nth-child(3),
+            .table-cell:nth-child(4) {
+                display: none;
+            }
+
+            /* Show mobile details on mobile */
+            .mobile-details {
+                display: block !important;
+            }
+
+            /* Modal optimization */
+            .modal {
+                width: 98%;
+                padding: 15px;
+                max-height: 90vh;
+            }
+
+            .modal-options {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .modal-option {
+                padding: 10px;
+            }
+
+            .modal-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .container {
+                padding: 8px;
+            }
+
+            .main-layout {
+                gap: 10px;
+            }
+
+            .statistics {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+
+            .table-row {
+                padding: 5px 8px;
+                min-height: 42px;
+            }
+
+            .btn-compact {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+                min-height: 30px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .statistics {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+            }
+
+            .table-row {
+                padding: 6px 10px;
+                min-height: 44px;
+            }
+        }
+
+        /* Touch interaction improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .queue-item {
+                transform: none !important;
+            }
+
+            .queue-item:active {
+                transform: scale(0.98);
+                background: #252525;
+            }
+
+            .btn:active {
+                transform: scale(0.95);
+            }
+
+            .tab-button:active {
+                transform: scale(0.98);
             }
         }
     </style>
 </head>
 <body>
+    <!-- High-Tech Visual Effects -->
+    <div class="tech-grid-overlay"></div>
+
     <div class="container">
         <div class="header">
-            <h1>🏎️ DriftRide Sales Queue Management</h1>
-            <p>Drag & Drop Queue Management • Payment Verification • Customer Support</p>
-        </div>
-
-        <div class="statistics">
-            <div class="stat-card">
-                <div class="stat-value" id="queueCount">0</div>
-                <div class="stat-label">In Queue</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="pendingCount">0</div>
-                <div class="stat-label">Pending Payments</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="completedToday">0</div>
-                <div class="stat-label">Completed Today</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="revenueToday">$0</div>
-                <div class="stat-label">Today's Revenue</div>
-            </div>
-        </div>
-
-        <div class="drag-instruction">
-            <strong>💡 Queue Management:</strong>
-            Drag customers to reorder the queue • Use <span class="key">R</span> to remove customers •
-            <span class="key">P</span> to prioritize • <span class="key">F5</span> to refresh
-        </div>
-
-        <div class="dashboard">
-            <!-- Queue Management Panel -->
-            <div class="queue-panel">
-                <div class="panel-header">
-                    <h2>🚗 Active Queue</h2>
-                    <span class="badge" id="queueBadge">0 waiting</span>
+            <div class="track-status-inline">
+                <span class="track-status-label">Track Status:</span>
+                <div class="toggle-switch hot" id="trackToggle" onclick="salesQueue.toggleTrackMode()">
+                    <div class="toggle-slider"></div>
                 </div>
-                <div class="panel-content">
-                    <div id="queueList" class="queue-list">
-                        <div class="empty-state">
-                            <div class="icon">🏁</div>
-                            <p>No customers in queue</p>
-                            <small>Confirmed payments will appear here</small>
-                        </div>
-                    </div>
-                </div>
+                <span class="track-mode-text hot" id="trackModeText">Hot Track</span>
             </div>
-
-            <!-- Pending Payments Panel -->
-            <div class="pending-panel">
-                <div class="panel-header">
+        </div>
+        <div class="main-layout">
+            <!-- 1. Pending Payments Table (TOP - Immediate Approval) -->
+            <div class="data-table minimized" id="pendingPaymentsSection">
+                <div class="table-header" onclick="salesQueue.togglePendingPayments()">
                     <h2>💳 Pending Payments</h2>
-                    <span class="badge" id="pendingBadge">0 pending</span>
+                    <span class="table-badge" id="pendingBadge">0 pending</span>
                 </div>
-                <div class="panel-content">
-                    <div id="pendingList" class="pending-list">
-                        <div class="empty-state">
-                            <div class="icon">✅</div>
-                            <p>No pending payments</p>
-                            <small>New payment submissions will appear here</small>
-                        </div>
+                <div class="table-content" id="pendingPaymentsTable">
+                    <div class="empty-state-compact">
+                        <div class="icon">✅</div>
+                        <p>No pending payments</p>
                     </div>
                 </div>
+            </div>
+
+            <!-- 2. Current Customer (Single Line) -->
+            <div id="currentCustomerLine" class="current-customer-line" style="display: none;">
+                <div class="customer-info-line" id="currentCustomerInfo">
+                    <!-- Current customer info will be populated here -->
+                </div>
+                <div class="customer-actions-line">
+                    <button class="btn-compact btn-complete" onclick="salesQueue.openCompleteRideModal()">
+                        ✅ Complete
+                    </button>
+                    <button class="btn-compact btn-return" onclick="salesQueue.openReturnToQueueModal()">
+                        ↩️ Return
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current Customer Empty State -->
+            <div id="currentCustomerEmpty" class="empty-state-compact">
+                <div class="icon">🚗</div>
+                <p>No current customer - Next customer will appear here</p>
+            </div>
+
+            <!-- 3. Active Queue Table -->
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>⏳ Active Queue</h2>
+                    <span class="table-badge" id="queueBadge">0 waiting</span>
+                </div>
+                <div class="table-content" id="activeQueueTable">
+                    <div class="empty-state-compact">
+                        <div class="icon">🏁</div>
+                        <p>No customers in queue</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Statistics Dashboard (BOTTOM) -->
+            <div class="statistics">
+                <div class="stat-card">
+                    <div class="stat-value" id="queueCount">0</div>
+                    <div class="stat-label">In Queue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pendingCount">0</div>
+                    <div class="stat-label">Pending Payments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completedToday">0</div>
+                    <div class="stat-label">Completed Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="revenueToday">$0</div>
+                    <div class="stat-label">Today's Revenue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Ride Modal -->
+    <div class="modal-overlay" id="completeRideModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✅ Complete Ride</h3>
+                <div class="modal-customer" id="completeModalCustomer">
+                    <!-- Customer info will be inserted here -->
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h4>How would you like to complete this ride?</h4>
+                <div class="modal-options">
+                    <div class="modal-option" data-action="complete" onclick="salesQueue.selectCompleteAction('complete')">
+                        <div class="modal-option-title">✅ Mark as Completed</div>
+                        <div class="modal-option-desc">Ride completed successfully</div>
+                    </div>
+                    <div class="modal-option" data-action="return" onclick="salesQueue.selectCompleteAction('return')">
+                        <div class="modal-option-title">↩️ Return to Queue</div>
+                        <div class="modal-option-desc">Customer returns to end of queue</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section" id="completeReasonSection" style="display: none;">
+                <h4>Completion Reason</h4>
+                <div class="modal-options" id="completeReasonOptions">
+                    <!-- Reason options will be inserted based on selected action -->
+                </div>
+            </div>
+
+            <div class="modal-notes">
+                <label for="completeNotes">Additional Notes (Optional)</label>
+                <textarea id="completeNotes" placeholder="Add any additional details..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="salesQueue.closeCompleteRideModal()">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="completeSubmitBtn" disabled onclick="salesQueue.submitCompleteRide()">Complete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Return to Queue Modal -->
+    <div class="modal-overlay" id="returnToQueueModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>↩️ Return to Queue</h3>
+                <div class="modal-customer" id="returnModalCustomer">
+                    <!-- Customer info will be inserted here -->
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h4>Why is this customer being returned to the queue?</h4>
+                <div class="modal-options">
+                    <div class="modal-option" data-reason="not_ready" onclick="salesQueue.selectReturnReason('not_ready')">
+                        <div class="modal-option-title">⏳ Customer Not Ready</div>
+                        <div class="modal-option-desc">Customer needs more time</div>
+                    </div>
+                    <div class="modal-option" data-reason="equipment_issue" onclick="salesQueue.selectReturnReason('equipment_issue')">
+                        <div class="modal-option-title">🔧 Equipment Issue</div>
+                        <div class="modal-option-desc">Technical problem needs resolution</div>
+                    </div>
+                    <div class="modal-option" data-reason="customer_request" onclick="salesQueue.selectReturnReason('customer_request')">
+                        <div class="modal-option-title">🙋 Customer Request</div>
+                        <div class="modal-option-desc">Customer asked to wait</div>
+                    </div>
+                    <div class="modal-option" data-reason="other" onclick="salesQueue.selectReturnReason('other')">
+                        <div class="modal-option-title">📝 Other Reason</div>
+                        <div class="modal-option-desc">Specify in notes</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-notes">
+                <label for="returnNotes">Notes (Optional)</label>
+                <textarea id="returnNotes" placeholder="Add any additional details..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="salesQueue.closeReturnToQueueModal()">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="returnSubmitBtn" disabled onclick="salesQueue.submitReturnToQueue()">Return to Queue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rider Replacement Modal -->
+    <div class="modal-overlay" id="riderReplacementModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>🔄 Replace Current Rider</h3>
+                <div class="modal-customer" id="replacementCurrentRider">
+                    <!-- Current rider info will be inserted here -->
+                </div>
+                <div class="replacement-arrow">↓</div>
+                <div class="modal-customer" id="replacementNewRider">
+                    <!-- New rider info will be inserted here -->
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <h4>What should happen to the current rider?</h4>
+                <div class="modal-options">
+                    <div class="modal-option" data-action="complete" onclick="salesQueue.selectReplacementAction('complete')">
+                        <div class="modal-option-title">✅ Mark as Completed</div>
+                        <div class="modal-option-desc">Current ride finished successfully</div>
+                    </div>
+                    <div class="modal-option" data-action="return" onclick="salesQueue.selectReplacementAction('return')">
+                        <div class="modal-option-title">↩️ Return to Queue</div>
+                        <div class="modal-option-desc">Current rider returns to end of queue</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-notes">
+                <label for="replacementNotes">Reason (Optional)</label>
+                <textarea id="replacementNotes" placeholder="Why is the current rider being replaced?"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="salesQueue.closeRiderReplacementModal()">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="replacementSubmitBtn" disabled onclick="salesQueue.submitRiderReplacement()">Replace Rider</button>
             </div>
         </div>
     </div>
@@ -381,8 +1665,11 @@
             constructor() {
                 this.queue = [];
                 this.pendingPayments = [];
+                this.completedRides = [];
                 this.stats = {};
-                this.draggedElement = null;
+                this.currentCustomer = null;
+                this.eventChannel = 'driftride_queue_updates';
+                this.trackMode = 'hot'; // Default to hot track mode
 
                 this.init();
             }
@@ -390,6 +1677,7 @@
             async init() {
                 await this.loadData();
                 this.setupEventListeners();
+                this.setupEventBroadcasting();
                 this.startPolling();
                 this.showNotification('Sales Queue Management loaded successfully!', 'success');
             }
@@ -397,9 +1685,11 @@
             async loadData() {
                 try {
                     await Promise.all([
+                        this.loadCurrentCustomer(),
                         this.loadQueue(),
                         this.loadPendingPayments(),
-                        this.loadStats()
+                        this.loadStats(),
+                        this.loadTrackMode()
                     ]);
                 } catch (error) {
                     console.error('Error loading data:', error);
@@ -408,120 +1698,308 @@
             }
 
             async loadQueue() {
-                const response = await fetch(`${API_BASE}/queue`);
-                const result = await response.json();
+                try {
+                    const response = await fetch(`${API_BASE}/queue`);
+                    const result = await response.json();
 
-                if (result.success) {
-                    this.queue = result.data || [];
-                    this.renderQueue();
-                    this.updateStatistics();
+                    if (result.success) {
+                        this.queue = result.data || [];
+                        this.renderQueue();
+                        this.updateStatistics();
+                    } else {
+                        console.error('API error loading queue:', result.error);
+                        this.showNotification('Failed to load queue data', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error loading queue:', error);
+                    this.showNotification('Failed to connect to server for queue data', 'error');
                 }
             }
 
             async loadPendingPayments() {
-                const response = await fetch(`${API_BASE}/payments/pending`);
-                const result = await response.json();
+                try {
+                    const response = await fetch(`${API_BASE}/payments/pending`);
+                    const result = await response.json();
 
-                if (result.success) {
-                    this.pendingPayments = result.data || [];
-                    this.renderPendingPayments();
-                    this.updateStatistics();
+                    if (result.success) {
+                        this.pendingPayments = result.data || [];
+                        this.renderPendingPayments();
+                        this.updateStatistics();
+                    } else {
+                        console.error('API error loading pending payments:', result.error);
+                        this.showNotification('Failed to load pending payments', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error loading pending payments:', error);
+                    this.showNotification('Failed to connect to server for payments data', 'error');
                 }
             }
 
             async loadStats() {
-                const response = await fetch(`${API_BASE}/stats`);
-                const result = await response.json();
+                try {
+                    const response = await fetch(`${API_BASE}/stats`);
+                    const result = await response.json();
 
-                if (result.success) {
-                    this.stats = result.data;
-                    this.updateStatistics();
+                    if (result.success) {
+                        this.stats = result.data;
+                        this.updateStatistics();
+                    } else {
+                        console.error('API error loading stats:', result.error);
+                        this.showNotification('Failed to load statistics', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error loading stats:', error);
+                    this.showNotification('Failed to connect to server for statistics', 'error');
                 }
             }
 
+            async loadTrackMode() {
+                try {
+                    const response = await fetch(`${API_BASE}/queue/track-mode`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.trackMode = result.data.mode;
+                        this.updateTrackModeUI();
+                    } else {
+                        console.error('API error loading track mode:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Error loading track mode:', error);
+                    // Default to hot track if unable to load
+                    this.trackMode = 'hot';
+                    this.updateTrackModeUI();
+                }
+            }
+
+            async setTrackMode(mode) {
+                try {
+                    const response = await fetch(`${API_BASE}/queue/track-mode`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mode })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.trackMode = mode;
+                        this.updateTrackModeUI();
+
+                        // Refresh data to reflect any changes from mode switching
+                        await this.loadCurrentCustomer();
+                        await this.loadQueue();
+
+                        const modeText = mode === 'hot' ? '🔥 Hot Track (Auto-progression)' : '❄️ Cold Track (Manual)';
+                        this.showNotification(`Track mode set to ${modeText}`, 'success');
+
+                        // Broadcast event for driver dashboard sync
+                        localStorage.setItem('driftride_event', JSON.stringify({
+                            type: 'track_mode_changed',
+                            timestamp: Date.now(),
+                            data: { mode, previousMode: result.data.previousMode }
+                        }));
+                    } else {
+                        this.showNotification('Failed to change track mode', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error setting track mode:', error);
+                    this.showNotification('Failed to connect to server for track mode', 'error');
+                }
+            }
+
+            updateTrackModeUI() {
+                // Update the floating toggle switch
+                const toggle = document.getElementById('trackToggle');
+                const text = document.getElementById('trackModeText');
+
+                if (this.trackMode === 'hot') {
+                    toggle.className = 'toggle-switch hot';
+                    text.className = 'track-mode-text hot';
+                    text.textContent = 'Hot Track';
+                } else {
+                    toggle.className = 'toggle-switch cold';
+                    text.className = 'track-mode-text cold';
+                    text.textContent = 'Cold Track';
+                }
+
+                // Update statistics which now includes track mode information
+                this.updateStatistics();
+            }
+
+            toggleTrackMode() {
+                const newMode = this.trackMode === 'hot' ? 'cold' : 'hot';
+                this.setTrackMode(newMode);
+            }
+
+            togglePendingPayments() {
+                const section = document.getElementById('pendingPaymentsSection');
+                if (section.classList.contains('minimized')) {
+                    section.classList.remove('minimized');
+                    section.classList.add('expanded');
+                } else {
+                    section.classList.add('minimized');
+                    section.classList.remove('expanded');
+                }
+            }
+
+            async loadCurrentCustomer() {
+                try {
+                    const response = await fetch(`${API_BASE}/queue/current`);
+
+                    if (response.status === 204) {
+                        // No current customer
+                        this.currentCustomer = null;
+                        this.renderCurrentCustomer();
+                        return;
+                    }
+
+                    const result = await response.json();
+                    if (result.success) {
+                        this.currentCustomer = result.data;
+                        this.renderCurrentCustomer();
+                    }
+                } catch (error) {
+                    console.error('Error loading current customer:', error);
+                    this.currentCustomer = null;
+                    this.renderCurrentCustomer();
+                }
+            }
+
+            renderCurrentCustomer() {
+                const lineElement = document.getElementById('currentCustomerLine');
+                const emptyElement = document.getElementById('currentCustomerEmpty');
+                const infoElement = document.getElementById('currentCustomerInfo');
+
+                if (!this.currentCustomer) {
+                    lineElement.style.display = 'none';
+                    emptyElement.style.display = 'block';
+                    return;
+                }
+
+                const customer = this.currentCustomer.customer;
+                const payment = this.currentCustomer.payment;
+                const queuedTime = new Date(this.currentCustomer.queuedAt);
+                const waitMinutes = Math.floor((new Date() - queuedTime) / 60000);
+
+                infoElement.innerHTML = `
+                    <div class="customer-info-item">
+                        <div class="customer-info-label">🏃 Current Customer</div>
+                        <div class="customer-info-value">${customer.name}</div>
+                    </div>
+                    <div class="customer-info-item">
+                        <div class="customer-info-label">📱 Phone</div>
+                        <div class="customer-info-value">${customer.phoneNumber}</div>
+                    </div>
+                    <div class="customer-info-item">
+                        <div class="customer-info-label">💰 Payment</div>
+                        <div class="customer-info-value">$${payment.amount.toFixed(2)} (${payment.paymentMethod})</div>
+                    </div>
+                    <div class="customer-info-item">
+                        <div class="customer-info-label">⏰ Wait Time</div>
+                        <div class="customer-info-value ${waitMinutes > 10 ? 'urgent' : ''}">${waitMinutes} min</div>
+                    </div>
+                `;
+
+                // Update onclick handlers with current customer ID
+                lineElement.querySelector('.btn-complete').onclick = () => this.openCompleteRideModal(this.currentCustomer.id);
+                lineElement.querySelector('.btn-return').onclick = () => this.openReturnToQueueModal(this.currentCustomer.id);
+
+                lineElement.style.display = 'grid';
+                emptyElement.style.display = 'none';
+            }
+
             renderQueue() {
-                const queueList = document.getElementById('queueList');
+                const queueTable = document.getElementById('activeQueueTable');
                 const waitingQueue = this.queue
                     .filter(item => item.status === 'Waiting')
                     .sort((a, b) => a.position - b.position);
 
                 if (waitingQueue.length === 0) {
-                    queueList.innerHTML = `
-                        <div class="empty-state">
+                    queueTable.innerHTML = `
+                        <div class="empty-state-compact">
                             <div class="icon">🏁</div>
                             <p>No customers in queue</p>
-                            <small>Confirmed payments will appear here</small>
                         </div>
                     `;
                     return;
                 }
 
-                queueList.innerHTML = waitingQueue.map((item, index) => `
-                    <div class="queue-item"
-                         draggable="true"
+                queueTable.innerHTML = waitingQueue.map((item, index) => `
+                    <div class="table-row"
                          data-queue-id="${item.id}"
                          data-position="${item.position}">
-                        <div class="queue-position ${index === 0 ? 'current' : ''}">${item.position}</div>
-                        <div class="customer-info">
-                            <div class="customer-details">
-                                <h3>${item.customer.name}</h3>
-                                <div class="customer-meta">
-                                    <span>📱 ${item.customer.phoneNumber}</span>
-                                    <span>💰 $${item.payment.amount}</span>
-                                    <span>⏰ ${this.formatTime(item.queuedAt)}</span>
-                                    <span>🔄 ${item.payment.paymentMethod}</span>
-                                </div>
-                            </div>
-                            <div class="customer-actions">
-                                <button class="btn btn-warning" onclick="salesQueue.prioritizeCustomer(${item.id})">
-                                    ⬆️ Priority
-                                </button>
-                                <button class="btn btn-danger" onclick="salesQueue.removeCustomer(${item.id})">
-                                    ❌ Remove
-                                </button>
-                            </div>
+                        <div class="table-cell name"
+                             data-phone="${item.customer.phoneNumber}"
+                             data-amount="$${item.payment.amount}"
+                             data-time="${this.formatTime(item.queuedAt)}">
+                            ${item.position}. ${item.customer.name}
+                            <div class="mobile-details">📱 ${item.customer.phoneNumber} • 💰 $${item.payment.amount} • ⏰ ${this.formatTime(item.queuedAt)}</div>
+                        </div>
+                        <div class="table-cell">📱 ${item.customer.phoneNumber}</div>
+                        <div class="table-cell">💰 $${item.payment.amount}</div>
+                        <div class="table-cell">⏰ ${this.formatTime(item.queuedAt)}</div>
+                        <div class="table-actions">
+                            <button class="btn-compact btn-start" onclick="salesQueue.startRide(${item.id})">
+                                🚗 Start
+                            </button>
+                            <button class="btn-compact btn-priority" onclick="salesQueue.prioritizeCustomer(${item.id})">
+                                ⬆️
+                            </button>
+                            <button class="btn-compact btn-remove" onclick="salesQueue.removeCustomer(${item.id})">
+                                ❌
+                            </button>
                         </div>
                     </div>
                 `).join('');
-
-                this.setupDragAndDrop();
             }
 
             renderPendingPayments() {
-                const pendingList = document.getElementById('pendingList');
+                const pendingTable = document.getElementById('pendingPaymentsTable');
+                const pendingSection = document.getElementById('pendingPaymentsSection');
 
                 if (this.pendingPayments.length === 0) {
-                    pendingList.innerHTML = `
-                        <div class="empty-state">
+                    // Keep minimized when empty
+                    pendingSection.classList.add('minimized');
+                    pendingSection.classList.remove('expanded');
+                    pendingTable.innerHTML = `
+                        <div class="empty-state-compact">
                             <div class="icon">✅</div>
                             <p>No pending payments</p>
-                            <small>New payment submissions will appear here</small>
                         </div>
                     `;
                     return;
+                } else {
+                    // Expand when there are payments
+                    pendingSection.classList.remove('minimized');
+                    pendingSection.classList.add('expanded');
                 }
 
-                pendingList.innerHTML = this.pendingPayments.map(payment => {
+                // Sort by urgency - most urgent first
+                const sortedPayments = this.pendingPayments.sort((a, b) => {
+                    const aMinutes = Math.floor((new Date() - new Date(a.createdAt)) / 60000);
+                    const bMinutes = Math.floor((new Date() - new Date(b.createdAt)) / 60000);
+                    return bMinutes - aMinutes; // Most urgent (highest minutes) first
+                });
+
+                pendingTable.innerHTML = sortedPayments.map(payment => {
                     const submittedMinutesAgo = Math.floor((new Date() - new Date(payment.createdAt)) / 60000);
                     const isUrgent = submittedMinutesAgo > 5;
 
                     return `
-                        <div class="pending-item ${isUrgent ? 'urgent' : ''}">
-                            <div class="customer-details">
-                                <h3>${payment.customer.name} ${isUrgent ? '🚨' : ''}</h3>
-                                <div class="customer-meta">
-                                    <span>📱 ${payment.customer.phoneNumber}</span>
-                                    <span>💰 $${payment.amount}</span>
-                                    <span>🔄 ${payment.paymentMethod}</span>
-                                    <span>⏰ ${submittedMinutesAgo}min ago</span>
-                                    ${payment.externalTransactionId ? `<span>🔗 ${payment.externalTransactionId}</span>` : ''}
-                                </div>
+                        <div class="table-row">
+                            <div class="table-cell name ${isUrgent ? 'urgent' : ''}">
+                                ${payment.customer.name} ${isUrgent ? '🚨' : ''}
+                                <div class="mobile-details">📱 ${payment.customer.phoneNumber} • 💰 $${payment.amount} (${payment.paymentMethod}) • ⏰ ${submittedMinutesAgo}min ago</div>
                             </div>
-                            <div class="payment-actions">
-                                <button class="btn btn-success" onclick="salesQueue.confirmPayment(${payment.id}, true)">
-                                    ✅ Confirm
+                            <div class="table-cell">📱 ${payment.customer.phoneNumber}</div>
+                            <div class="table-cell">💰 $${payment.amount} (${payment.paymentMethod})</div>
+                            <div class="table-cell ${isUrgent ? 'urgent' : ''}">⏰ ${submittedMinutesAgo}min ago</div>
+                            <div class="table-actions">
+                                <button class="btn-compact btn-approve" onclick="salesQueue.confirmPayment(${payment.id}, true)">
+                                    ✅ Approve
                                 </button>
-                                <button class="btn btn-danger" onclick="salesQueue.confirmPayment(${payment.id}, false)">
+                                <button class="btn-compact btn-deny" onclick="salesQueue.confirmPayment(${payment.id}, false)">
                                     ❌ Deny
                                 </button>
                             </div>
@@ -530,43 +2008,6 @@
                 }).join('');
             }
 
-            setupDragAndDrop() {
-                const queueItems = document.querySelectorAll('.queue-item');
-
-                queueItems.forEach(item => {
-                    item.addEventListener('dragstart', (e) => {
-                        this.draggedElement = item;
-                        item.classList.add('dragging');
-                        e.dataTransfer.effectAllowed = 'move';
-                    });
-
-                    item.addEventListener('dragend', () => {
-                        item.classList.remove('dragging');
-                        this.draggedElement = null;
-                    });
-
-                    item.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        item.classList.add('drag-over');
-                    });
-
-                    item.addEventListener('dragleave', () => {
-                        item.classList.remove('drag-over');
-                    });
-
-                    item.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        item.classList.remove('drag-over');
-
-                        if (this.draggedElement && this.draggedElement !== item) {
-                            this.reorderQueue(
-                                parseInt(this.draggedElement.dataset.queueId),
-                                parseInt(item.dataset.queueId)
-                            );
-                        }
-                    });
-                });
-            }
 
             async reorderQueue(draggedId, targetId) {
                 try {
@@ -601,6 +2042,7 @@
 
                     if (response.ok) {
                         await this.loadQueue();
+                        this.broadcastQueueUpdate('queue_reordered', { newOrder });
                         this.showNotification('Queue reordered successfully', 'success');
                     }
                 } catch (error) {
@@ -622,11 +2064,54 @@
 
                     if (response.ok) {
                         await this.loadQueue();
+                        this.broadcastQueueUpdate('customer_prioritized', { queueId, newOrder });
                         this.showNotification('Customer moved to front of queue', 'success');
                     }
                 } catch (error) {
                     console.error('Error prioritizing customer:', error);
                     this.showNotification('Failed to prioritize customer', 'error');
+                }
+            }
+
+            async startRide(queueId) {
+                const customer = this.queue.find(q => q.id === queueId);
+                if (!customer) return;
+
+                try {
+                    const response = await fetch(`${API_BASE}/queue/${queueId}/start-ride`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            startedBy: 'sales@example.com'
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (response.status === 409) {
+                        // Current rider exists, show replacement modal
+                        this.selectedQueueCustomer = customer;
+                        this.openRiderReplacementModal(result.error.currentRider);
+                        return;
+                    }
+
+                    if (result.success) {
+                        await this.loadQueue();
+                        await this.loadCurrentCustomer();
+                        this.showNotification(`${customer.customer.name} ride started`, 'success');
+
+                        // Broadcast event
+                        localStorage.setItem('driftride_event', JSON.stringify({
+                            type: 'current_customer_changed',
+                            timestamp: Date.now(),
+                            data: { action: 'start', customer: result.data }
+                        }));
+                    } else {
+                        this.showNotification('Failed to start ride', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error starting ride:', error);
+                    this.showNotification('Failed to start ride', 'error');
                 }
             }
 
@@ -672,18 +2157,22 @@
             }
 
             updateStatistics() {
+                // Update main dashboard statistics
                 document.getElementById('queueCount').textContent =
                     this.queue.filter(q => q.status === 'Waiting').length;
 
                 document.getElementById('pendingCount').textContent =
                     this.pendingPayments.length;
 
+                // Update table badges
                 document.getElementById('queueBadge').textContent =
                     `${this.queue.filter(q => q.status === 'Waiting').length} waiting`;
 
                 document.getElementById('pendingBadge').textContent =
                     `${this.pendingPayments.length} pending`;
 
+
+                // Update statistics from API data
                 if (this.stats) {
                     document.getElementById('completedToday').textContent = this.stats.completedRides || 0;
                     document.getElementById('revenueToday').textContent = `$${(this.stats.totalRevenue || 0).toFixed(2)}`;
@@ -691,8 +2180,20 @@
             }
 
             setupEventListeners() {
+                // Modal click outside to close
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('modal-overlay')) {
+                        this.closeCompleteRideModal();
+                        this.closeReturnToQueueModal();
+                    }
+                });
+
                 // Keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.closeCompleteRideModal();
+                        this.closeReturnToQueueModal();
+                    }
                     if (e.key === 'F5') {
                         e.preventDefault();
                         this.loadData();
@@ -707,10 +2208,10 @@
             }
 
             startPolling() {
-                // Refresh every 10 seconds
+                // Refresh every 5 seconds for better responsiveness (real-time updates via events)
                 setInterval(() => {
                     this.loadData();
-                }, 10000);
+                }, 5000);
             }
 
             formatTime(dateString) {
@@ -725,6 +2226,291 @@
                 if (diffHours < 24) return `${diffHours}h ago`;
 
                 return date.toLocaleDateString();
+            }
+
+            setupEventBroadcasting() {
+                // Listen for storage events from other windows/tabs
+                window.addEventListener('storage', (event) => {
+                    if (event.key === this.eventChannel) {
+                        const eventData = JSON.parse(event.newValue);
+                        this.handleBroadcastEvent(eventData);
+                    }
+                });
+            }
+
+            broadcastQueueUpdate(updateType, data = {}) {
+                const eventData = {
+                    type: updateType,
+                    timestamp: new Date().toISOString(),
+                    source: 'sales-dashboard',
+                    data: data
+                };
+
+                // Use localStorage to broadcast to other windows/tabs
+                localStorage.setItem(this.eventChannel, JSON.stringify(eventData));
+
+                // Clear the event after a short delay to trigger storage event
+                setTimeout(() => {
+                    localStorage.removeItem(this.eventChannel);
+                }, 100);
+            }
+
+            async handleBroadcastEvent(eventData) {
+                console.log('Received broadcast event:', eventData);
+
+                // Handle different event types
+                switch (eventData.type) {
+                    case 'ride_completed':
+                    case 'ride_completed_by_sales':
+                        // Immediate refresh when rides are completed
+                        this.showNotification('Ride completed - updating dashboard', 'success');
+                        await this.loadData();
+                        break;
+
+                    case 'track_mode_changed':
+                        // Update when track mode changes
+                        this.showNotification(`Track mode changed to ${eventData.data.mode}`, 'info');
+                        await this.loadTrackMode();
+                        await this.loadCurrentCustomer();
+                        await this.loadQueue();
+                        break;
+
+                    case 'current_customer_changed':
+                        // Update when current customer changes
+                        this.showNotification('Current customer updated', 'info');
+                        await this.loadCurrentCustomer();
+                        await this.loadQueue();
+                        break;
+
+                    case 'queue_updated':
+                    case 'customer_added':
+                    case 'customer_removed':
+                        // Update when queue changes
+                        await this.loadQueue();
+                        await this.loadCurrentCustomer();
+                        break;
+
+                    default:
+                        console.log('Unhandled event type:', eventData.type);
+                }
+
+                // Update last updated time
+                this.updateStatistics();
+            }
+
+            // Modal Management Methods
+            openCompleteRideModal(queueId) {
+                if (!this.currentCustomer || this.currentCustomer.id !== queueId) {
+                    this.showNotification('Current customer not found', 'error');
+                    return;
+                }
+
+                this.currentModalQueueId = queueId;
+                this.currentCompleteAction = null;
+                this.currentCompleteReason = null;
+
+                // Reset form
+                document.getElementById('completeNotes').value = '';
+                document.querySelectorAll('#completeRideModal .modal-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                document.getElementById('completeReasonSection').style.display = 'none';
+                document.getElementById('completeSubmitBtn').disabled = true;
+
+                // Populate customer info
+                const customer = this.currentCustomer.customer;
+                const payment = this.currentCustomer.payment;
+                document.getElementById('completeModalCustomer').innerHTML = `
+                    <div class="modal-customer-name">${customer.name}</div>
+                    <div class="modal-customer-details">${customer.phoneNumber} • ${payment.paymentMethod} • $${payment.amount.toFixed(2)}</div>
+                `;
+
+                // Show modal
+                document.getElementById('completeRideModal').classList.add('active');
+            }
+
+            closeCompleteRideModal() {
+                document.getElementById('completeRideModal').classList.remove('active');
+            }
+
+            selectCompleteAction(action) {
+                this.currentCompleteAction = action;
+
+                // Update UI
+                document.querySelectorAll('#completeRideModal .modal-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                document.querySelector(`[data-action="${action}"]`).classList.add('selected');
+
+                // Show reason section with appropriate options
+                const reasonSection = document.getElementById('completeReasonSection');
+                const reasonOptions = document.getElementById('completeReasonOptions');
+
+                if (action === 'complete') {
+                    reasonOptions.innerHTML = `
+                        <div class="modal-option" data-reason="ride_completed" onclick="salesQueue.selectCompleteReason('ride_completed')">
+                            <div class="modal-option-title">✅ Ride Completed</div>
+                            <div class="modal-option-desc">Normal ride completion</div>
+                        </div>
+                        <div class="modal-option" data-reason="issue_resolved" onclick="salesQueue.selectCompleteReason('issue_resolved')">
+                            <div class="modal-option-title">🔧 Issue Resolved</div>
+                            <div class="modal-option-desc">Customer issue was resolved</div>
+                        </div>
+                    `;
+                } else if (action === 'return') {
+                    reasonOptions.innerHTML = `
+                        <div class="modal-option" data-reason="not_ready" onclick="salesQueue.selectCompleteReason('not_ready')">
+                            <div class="modal-option-title">⏳ Customer Not Ready</div>
+                            <div class="modal-option-desc">Customer needs more time</div>
+                        </div>
+                        <div class="modal-option" data-reason="equipment_issue" onclick="salesQueue.selectCompleteReason('equipment_issue')">
+                            <div class="modal-option-title">🔧 Equipment Issue</div>
+                            <div class="modal-option-desc">Technical problem</div>
+                        </div>
+                    `;
+                }
+
+                reasonSection.style.display = 'block';
+                this.currentCompleteReason = null;
+                document.getElementById('completeSubmitBtn').disabled = true;
+            }
+
+            selectCompleteReason(reason) {
+                this.currentCompleteReason = reason;
+
+                // Update UI
+                document.querySelectorAll('#completeReasonOptions .modal-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                document.querySelector(`[data-reason="${reason}"]`).classList.add('selected');
+
+                // Enable submit button
+                document.getElementById('completeSubmitBtn').disabled = false;
+            }
+
+            async submitCompleteRide() {
+                if (!this.currentCompleteAction || !this.currentCompleteReason) {
+                    this.showNotification('Please select an action and reason', 'error');
+                    return;
+                }
+
+                const notes = document.getElementById('completeNotes').value;
+
+                try {
+                    const response = await fetch(`${API_BASE}/queue/${this.currentModalQueueId}/complete-from-sales`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: this.currentCompleteAction,
+                            reason: this.currentCompleteReason,
+                            notes
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        await this.loadData();
+
+                        const actionText = this.currentCompleteAction === 'complete' ? 'completed' : 'returned to queue';
+                        this.showNotification(`Customer ${actionText} successfully`, 'success');
+
+                        // Broadcast event for real-time updates
+                        this.broadcastQueueUpdate('current_customer_changed', {
+                            action: this.currentCompleteAction,
+                            queueId: this.currentModalQueueId
+                        });
+
+                        this.closeCompleteRideModal();
+                    } else {
+                        this.showNotification('Failed to process request', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error completing ride:', error);
+                    this.showNotification('Failed to process request', 'error');
+                }
+            }
+
+            openReturnToQueueModal(queueId) {
+                if (!this.currentCustomer || this.currentCustomer.id !== queueId) {
+                    this.showNotification('Current customer not found', 'error');
+                    return;
+                }
+
+                this.currentModalQueueId = queueId;
+                this.currentReturnReason = null;
+
+                // Reset form
+                document.getElementById('returnNotes').value = '';
+                document.querySelectorAll('#returnToQueueModal .modal-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                document.getElementById('returnSubmitBtn').disabled = true;
+
+                // Populate customer info
+                const customer = this.currentCustomer.customer;
+                const payment = this.currentCustomer.payment;
+                document.getElementById('returnModalCustomer').innerHTML = `
+                    <div class="modal-customer-name">${customer.name}</div>
+                    <div class="modal-customer-details">${customer.phoneNumber} • ${payment.paymentMethod} • $${payment.amount.toFixed(2)}</div>
+                `;
+
+                // Show modal
+                document.getElementById('returnToQueueModal').classList.add('active');
+            }
+
+            closeReturnToQueueModal() {
+                document.getElementById('returnToQueueModal').classList.remove('active');
+            }
+
+            selectReturnReason(reason) {
+                this.currentReturnReason = reason;
+
+                // Update UI
+                document.querySelectorAll('#returnToQueueModal .modal-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                document.querySelector(`[data-reason="${reason}"]`).classList.add('selected');
+
+                // Enable submit button
+                document.getElementById('returnSubmitBtn').disabled = false;
+            }
+
+            async submitReturnToQueue() {
+                if (!this.currentReturnReason) {
+                    this.showNotification('Please select a reason', 'error');
+                    return;
+                }
+
+                const notes = document.getElementById('returnNotes').value;
+
+                try {
+                    const response = await fetch(`${API_BASE}/queue/${this.currentModalQueueId}/return-to-queue`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            reason: this.currentReturnReason,
+                            notes
+                        })
+                    });
+
+                    if (response.ok) {
+                        await this.loadData();
+                        this.showNotification('Customer returned to queue successfully', 'success');
+
+                        // Broadcast event for real-time updates
+                        this.broadcastQueueUpdate('customer_returned_to_queue', {
+                            queueId: this.currentModalQueueId,
+                            reason: this.currentReturnReason
+                        });
+
+                        this.closeReturnToQueueModal();
+                    } else {
+                        this.showNotification('Failed to return customer to queue', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error returning customer to queue:', error);
+                    this.showNotification('Failed to return customer to queue', 'error');
+                }
             }
 
             showNotification(message, type = 'info') {
@@ -777,6 +2563,109 @@
                     }, 300);
                 }, 3000);
             }
+
+        // Rider Replacement Modal Methods
+        openRiderReplacementModal(currentRider) {
+            this.replacementAction = null;
+
+            // Show current rider info
+            document.getElementById('replacementCurrentRider').innerHTML = `
+                <h4>🚗 Current Rider</h4>
+                <div class="customer-name">${currentRider.customer.name}</div>
+                <div class="customer-details">📱 ${currentRider.customer.phoneNumber} • 💰 $${currentRider.payment.amount}</div>
+            `;
+
+            // Show new rider info
+            document.getElementById('replacementNewRider').innerHTML = `
+                <h4>⏭️ New Rider</h4>
+                <div class="customer-name">${this.selectedQueueCustomer.customer.name}</div>
+                <div class="customer-details">📱 ${this.selectedQueueCustomer.customer.phoneNumber} • 💰 $${this.selectedQueueCustomer.payment.amount}</div>
+            `;
+
+            // Reset selections
+            document.querySelectorAll('#riderReplacementModal .modal-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.getElementById('replacementSubmitBtn').disabled = true;
+            document.getElementById('replacementNotes').value = '';
+
+            document.getElementById('riderReplacementModal').classList.add('active');
+        }
+
+        closeRiderReplacementModal() {
+            document.getElementById('riderReplacementModal').classList.remove('active');
+            this.selectedQueueCustomer = null;
+            this.replacementAction = null;
+        }
+
+        selectReplacementAction(action) {
+            this.replacementAction = action;
+
+            // Update UI
+            document.querySelectorAll('#riderReplacementModal .modal-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`#riderReplacementModal .modal-option[data-action="${action}"]`).classList.add('selected');
+            document.getElementById('replacementSubmitBtn').disabled = false;
+        }
+
+        async submitRiderReplacement() {
+            if (!this.replacementAction || !this.selectedQueueCustomer) return;
+
+            const notes = document.getElementById('replacementNotes').value;
+
+            try {
+                // First, handle the current rider based on selected action
+                const currentRiderResponse = await fetch(`${API_BASE}/queue/${this.currentCustomer.id}/complete-from-sales`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: this.replacementAction,
+                        reason: `Replaced by ${this.selectedQueueCustomer.customer.name}`,
+                        notes: notes
+                    })
+                });
+
+                if (!currentRiderResponse.ok) {
+                    throw new Error('Failed to handle current rider');
+                }
+
+                // Then start the new rider
+                const newRiderResponse = await fetch(`${API_BASE}/queue/${this.selectedQueueCustomer.id}/start-ride`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        startedBy: 'sales@example.com'
+                    })
+                });
+
+                const newRiderResult = await newRiderResponse.json();
+
+                if (newRiderResult.success) {
+                    await this.loadQueue();
+                    await this.loadCurrentCustomer();
+                    this.closeRiderReplacementModal();
+
+                    const actionText = this.replacementAction === 'complete' ? 'completed' : 'returned to queue';
+                    this.showNotification(`Rider replaced: Previous rider ${actionText}, ${this.selectedQueueCustomer.customer.name} now riding`, 'success');
+
+                    // Broadcast event
+                    localStorage.setItem('driftride_event', JSON.stringify({
+                        type: 'current_customer_changed',
+                        timestamp: Date.now(),
+                        data: { action: 'replace', customer: newRiderResult.data }
+                    }));
+                } else {
+                    this.showNotification('Failed to start new rider', 'error');
+                }
+            } catch (error) {
+                console.error('Error replacing rider:', error);
+                this.showNotification('Failed to replace rider', 'error');
+            }
+        }
+
+
+
         }
 
         // Initialize the application
